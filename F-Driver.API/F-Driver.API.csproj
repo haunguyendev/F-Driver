@@ -24,11 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Validation\" />
-    <Folder Include="Payloads\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\F-Driver.Service\F-Driver.Service.csproj" />
   </ItemGroup>
 
