@@ -8,7 +8,7 @@ using F_Driver.DataAccessObject.Models;
 
 namespace F_Driver.Repository.Repositories
 {
-    public class TransactionRepository : RepositoryBaseAsync<Transaction>, ITripMatchRepository
+    public class TransactionRepository : RepositoryBaseAsync<Transaction>, ITransactionRepository
     {
         public TransactionRepository(DataAccessObject.Models.FDriverContext dbContext) : base(dbContext)
         {

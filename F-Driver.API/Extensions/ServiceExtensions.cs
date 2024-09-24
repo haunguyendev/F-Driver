@@ -1,5 +1,9 @@
 ﻿using F_Driver.API.Middleware;
 using F_Driver.DataAccessObject.Models;
+using F_Driver.Repository;
+using F_Driver.Repository.Interfaces;
+using F_Driver.Repository.Repositories;
+using F_Driver.Service.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
@@ -33,9 +37,7 @@ namespace F_Driver.API.Extensions
             });
 
             services.ConfigureDbContext(configuration);
-
             // Configure Redis connection
-
             // Add StackExchangeRedisCache as the IDistributedCache implementation
             services.AddInfrastructureServices();
             // Add Mapper Services to Container injection
@@ -63,8 +65,48 @@ namespace F_Driver.API.Extensions
 
         private static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
         {
+            //Add Service
+            return services.AddScoped<CancellationService>()
+                .AddScoped<CancellationService>()
+                .AddScoped<DriverService>()
+                .AddScoped<FeedbackService>()
+                .AddScoped<MessageService>()
+                .AddScoped<PaymentService>()
+                .AddScoped<PriceTableService>()
+                .AddScoped<TransactionService>()
+                .AddScoped<TripMatchService>()
+                .AddScoped<UserService>()
+                .AddScoped<VehicleService>()
+                .AddScoped<WalletService>()
+                .AddScoped<FeedbackService>()
+                .AddScoped<ZoneService>()
+           //Add repository
+                .AddScoped<ICancellationReasonRepository,CancellationReasonRepository>()
+                .AddScoped<ICancellationRepository, CancellationRepository>()
+                .AddScoped<IDriverRepository, DriverRepository>()
+                .AddScoped<IFeedbackRepository, FeedbackRepository>()
+                .AddScoped<IMessageRepository, MessageRepository>()
+                .AddScoped<IPaymentRepository, PaymentRepository>()
+                .AddScoped<IPriceTableRepository, PriceTableRepository>()
+                .AddScoped<ITransactionRepository, TransactionRepository>()
+                .AddScoped<ITripMatchRepository, TripMatchRepository>()
+                .AddScoped<ITripRequestRepository, TripRequestRepository>()
+                .AddScoped<IUserRepository, UserRepository>()
+                .AddScoped<IVehicleRepository, VehicleRepository>()
+                .AddScoped<IWalletRepository, WalletRepository>()
+                .AddScoped<IZoneRepository, ZoneRepository>()
+                .AddScoped<IUnitOfWork, UnitOfWork>()
+                
 
-            return services;
+                
+
+
+
+
+
+
+
+                ;
 
 
 

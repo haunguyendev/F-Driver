@@ -10,5 +10,8 @@ namespace F_Driver.Repository.Repositories
 {
     public class PaymentRepository : RepositoryBaseAsync<Payment>, IPaymentRepository
     {
+        public PaymentRepository(FDriverContext dbContext) : base(dbContext)
+        {
+        }
     }
 }
