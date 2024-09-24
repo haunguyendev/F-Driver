@@ -1,9 +1,11 @@
 ﻿using F_Driver.API.Middleware;
 using F_Driver.DataAccessObject.Models;
+using F_Driver.Helpers;
 using F_Driver.Repository;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Repository.Repositories;
 using F_Driver.Service.Services;
+using F_Driver.Service.Settings;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +25,27 @@ namespace F_Driver.API.Extensions
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.AddMemoryCache();
             services.AddEndpointsApiExplorer();
-    
+
             //services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            //Get config mail form environment
+            services.Configure<MailSettings>(options =>
+            {
+                options.Server = Environment.GetEnvironmentVariable("MailSettings__Server");
+                options.Port = int.Parse(Environment.GetEnvironmentVariable("MailSettings__Port") ?? "0");
+                options.SenderName = Environment.GetEnvironmentVariable("MailSettings__SenderName");
+                options.SenderEmail = Environment.GetEnvironmentVariable("MailSettings__SenderEmail");
+                options.UserName = Environment.GetEnvironmentVariable("MailSettings__UserName");
+                options.Password = Environment.GetEnvironmentVariable("MailSettings__Password");
+            });
+
+
+            services.Configure<FirebaseSettings>(config =>
+            {
+                config.ApiKey = Environment.GetEnvironmentVariable("FIREBASE_API_KEY");
+                config.AuthEmail = Environment.GetEnvironmentVariable("FIREBASE_AUTH_EMAIL");
+                config.AuthPassword = Environment.GetEnvironmentVariable("FIREBASE_AUTH_PASSWORD");
+                config.Bucket = Environment.GetEnvironmentVariable("FIREBASE_BUCKET");
+            });
 
             //services.Configure<CloundSettings>(configuration.GetSection(nameof(CloundSettings)));
 
