@@ -43,7 +43,7 @@ namespace F_Driver.API.Middleware
                 return Task.CompletedTask;
             }
 
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.StatusCode = StatusCodes.Status500publicServerError;
             Console.WriteLine(ex.ToString());
             return Task.CompletedTask;
         }

@@ -9,10 +9,38 @@ using System.Threading.Tasks;
 
 namespace F_Driver.Repository
 {
-    public class UnitOfWork: IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly FDriverContext _context;
         private IDbContextTransaction _currentTransaction;
+
+        public ICancellationReasonRepository CancellationReasons { get; }
+
+        public ICancellationRepository Cancellations { get; }
+
+        public IDriverRepository Driver { get; }
+
+        public IFeedbackRepository Feedbacks { get; }
+
+        public IMessageRepository Messages { get; }
+
+        public IPaymentRepository Payments { get; }
+
+        public IPriceTableRepository PriceTables { get; }
+
+        public ITransactionRepository Transactions { get; }
+
+        public ITripMatchRepository TripMatchs { get; }
+
+        public ITripRequestRepository TripRequests { get; }
+
+        public IUserRepository Users { get; }
+
+        public IVehicleRepository Vehicles { get; }
+
+        public IWalletRepository Wallets { get; }
+
+        public IZoneRepository Zones { get; }
 
         public FDriverContext GetDbContext()
         {

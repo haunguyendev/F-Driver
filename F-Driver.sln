@@ -3,13 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F-Driver.API", "F-Driver.API\F-Driver.API.csproj", "{92251A18-68EC-4015-A110-56A1CF550868}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F-Driver.API", "F-Driver.API\F-Driver.API.csproj", "{92251A18-68EC-4015-A110-56A1CF550868}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F-Driver.Service", "F-Driver.Service\F-Driver.Service.csproj", "{5DA2BF66-F6F6-441F-A226-D7602AFEF514}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F-Driver.Service", "F-Driver.Service\F-Driver.Service.csproj", "{5DA2BF66-F6F6-441F-A226-D7602AFEF514}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F-Driver.Repository", "F-Driver.Repository\F-Driver.Repository.csproj", "{BA14BDBB-1228-4DD2-A4BB-2EDCD2FB202F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F-Driver.Repository", "F-Driver.Repository\F-Driver.Repository.csproj", "{BA14BDBB-1228-4DD2-A4BB-2EDCD2FB202F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F-Driver.DataAccessObject", "F-Driver.DataAccessObject\F-Driver.DataAccessObject.csproj", "{2D2FE1BC-0AAE-4D54-9140-A05316F991FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F-Driver.DataAccessObject", "F-Driver.DataAccessObject\F-Driver.DataAccessObject.csproj", "{2D2FE1BC-0AAE-4D54-9140-A05316F991FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OtherSrc", "OtherSrc", "{B7B56BAA-8D33-41FD-981E-ECD41E1CE751}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+		Jenkinsfile = Jenkinsfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
