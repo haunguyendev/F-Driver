@@ -48,6 +48,7 @@ public partial class User : EntityBase
     public string? StudentId { get; set; }
 
     public bool? Verified { get; set; }
+    public string? VerificationStatus { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
