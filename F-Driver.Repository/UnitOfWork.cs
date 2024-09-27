@@ -46,9 +46,24 @@ namespace F_Driver.Repository
         {
             return _context;
         }
-        public UnitOfWork(FDriverContext context)
+
+        public UnitOfWork(FDriverContext context, ICancellationReasonRepository cancellationReasons, ICancellationRepository cancellations, IDriverRepository driver, IFeedbackRepository feedbacks, IMessageRepository messages, IPaymentRepository payments, IPriceTableRepository priceTables, ITransactionRepository transactions, ITripMatchRepository tripMatchs, ITripRequestRepository tripRequests, IUserRepository users, IVehicleRepository vehicles, IWalletRepository wallets, IZoneRepository zones)
         {
             _context = context;
+            CancellationReasons = cancellationReasons;
+            Cancellations = cancellations;
+            Driver = driver;
+            Feedbacks = feedbacks;
+            Messages = messages;
+            Payments = payments;
+            PriceTables = priceTables;
+            Transactions = transactions;
+            TripMatchs = tripMatchs;
+            TripRequests = tripRequests;
+            Users = users;
+            Vehicles = vehicles;
+            Wallets = wallets;
+            Zones = zones;
         }
 
         public void Dispose()
