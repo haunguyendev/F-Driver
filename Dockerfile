@@ -15,11 +15,11 @@ COPY ["F-Driver.DataAccessObject/F-Driver.DataAccessObject.csproj", "F-Driver.Da
 RUN dotnet restore "./F-Driver.API/F-Driver.API.csproj"
 COPY . .
 WORKDIR "/src/F-Driver.API"
-RUN dotnet build "./F-Driver.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "F-Driver.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS public
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet public "./F-Driver.API.csproj" -c $BUILD_CONFIGURATION -o /app/public /p:UseAppHost=false
+RUN dotnet public "F-Driver.API.csproj" -c $BUILD_CONFIGURATION -o /app/public /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
