@@ -4,12 +4,14 @@ using F_Driver.Helpers;
 using F_Driver.Repository;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Repository.Repositories;
+using F_Driver.Service.Mapper;
 using F_Driver.Service.Services;
 using F_Driver.Service.Settings;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 namespace F_Driver.API.Extensions
 {
@@ -21,7 +23,10 @@ namespace F_Driver.API.Extensions
           
         
             services.AddScoped<ExceptionMiddleware>();
-            services.AddControllers();
+            services.AddControllers()
+                    .AddJsonOptions(x =>
+                        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); // Ngăn không tuần tự hóa vòng lặp
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.AddMemoryCache();
             services.AddEndpointsApiExplorer();
@@ -92,6 +97,7 @@ namespace F_Driver.API.Extensions
             // Add StackExchangeRedisCache as the IDistributedCache implementation
             services.AddInfrastructureServices();
             // Add Mapper Services to Container injection
+            services.AddAutoMapper(typeof(ApplicationMapper));
 
             return services;
         }
@@ -103,7 +109,7 @@ namespace F_Driver.API.Extensions
             //var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
             //var dbTrustServerCertificate = Environment.GetEnvironmentVariable("DB_TRUST_SERVER_CERTIFICATE");
             //var dbMultipleActiveResultSets = Environment.GetEnvironmentVariable("DB_MULTIPLE_ACTIVE_RESULT_SETS");
-            var connectionString = configuration.GetConnectionString("DefaultConnectionString");
+            var connectionString = configuration.GetConnectionString("DbConnection");
             //var connectionString = $"Data Source={dbServer};Initial Catalog={dbName};User ID={dbUser};Password={dbPassword};TrustServerCertificate={dbTrustServerCertificate};MultipleActiveResultSets={dbMultipleActiveResultSets}";
 
             services.AddDbContext<FDriverContext>(opt =>
@@ -131,6 +137,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<WalletService>()
                 .AddScoped<FeedbackService>()
                 .AddScoped<ZoneService>()
+                .AddScoped<FirebaseService>()
            //Add repository
                 .AddScoped<ICancellationReasonRepository,CancellationReasonRepository>()
                 .AddScoped<ICancellationRepository, CancellationRepository>()
