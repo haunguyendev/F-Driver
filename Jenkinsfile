@@ -43,7 +43,7 @@ pipeline {
                     string(credentialsId: 'FIREBASE_BUCKET', variable: 'FIREBASE_BUCKET')
                 ]) {
                     echo 'Deploying and cleaning'
-                    sh 'docker container stop fdriverapi || echo "this container does not exist"'
+                    sh 'docker container stop fjourneyapi || echo "this container does not exist"'
                     sh 'echo y | docker system prune'
                     sh '''docker container run \
                         -e SECRET_KEY="${SECRET_KEY}" \
@@ -65,7 +65,7 @@ pipeline {
                         -e FIREBASE_AUTH_EMAIL="${FIREBASE_AUTH_EMAIL}" \
                         -e FIREBASE_AUTH_PASSWORD="${FIREBASE_AUTH_PASSWORD}" \
                         -e FIREBASE_BUCKET="${FIREBASE_BUCKET}" \
-                        -d --name fdriverapi -p 8082:8080 -p 8083:8081 chalsfptu/fjourneyapi'''
+                        -d --name fjourneyapi -p 8082:8080 -p 8083:8081 chalsfptu/fjourneyapi'''
                 }s
             }
         }
