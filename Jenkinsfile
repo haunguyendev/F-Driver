@@ -1,8 +1,6 @@
 pipeline {
 
-     agent {
-        label 'host-agent'
-    }
+    agent any
 
     
     stages {
