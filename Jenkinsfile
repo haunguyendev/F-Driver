@@ -70,7 +70,6 @@ pipeline {
                 -e FIREBASE_AUTH_EMAIL="${FIREBASE_AUTH_EMAIL}" \
                 -e FIREBASE_AUTH_PASSWORD="${FIREBASE_AUTH_PASSWORD}" \
                 -e FIREBASE_BUCKET="${FIREBASE_BUCKET}" \
-                -e VNPaySettings__Version="${VNPaySettings__Version}" \
                 -d --name fjourneyapi -p 8082:8080 -p 8083:8081 chalsfptu/fjourneyapi'''
         }
     }
