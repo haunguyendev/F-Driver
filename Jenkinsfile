@@ -9,7 +9,7 @@ pipeline {
 
             steps {
                 
-                sh 'docker build --pull -f Dockerfile -t flocalbrandapi:latest .'
+                sh 'docker build --pull -f Dockerfile -t fjourneyapi:latest .'
                 
             }
         }
@@ -18,8 +18,8 @@ pipeline {
 
             steps {
                 withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                    sh 'docker tag flocalbrandapi:latest chalsfptu/flocalbrandapi:latest'
-                    sh 'docker push chalsfptu/flocalbrandapi:latest'
+                    sh 'docker tag fjourneyapi:latest chalsfptu/fjourneyapi:latest'
+                    sh 'docker push chalsfptu/fjourneyapi:latest'
                 }
             }
         }
@@ -48,7 +48,7 @@ pipeline {
             string(credentialsId: 'FIREBASE_BUCKET', variable: 'FIREBASE_BUCKET')
         ]) {
             echo 'Deploying and cleaning'
-            sh 'docker container stop flocalbrandapi || echo "this container does not exist"'
+            sh 'docker container stop fjourneyapi || echo "this container does not exist"'
             sh 'echo y | docker system prune'
             sh '''docker container run \
                 -e SECRET_KEY="${SECRET_KEY}" \
@@ -71,7 +71,7 @@ pipeline {
                 -e FIREBASE_AUTH_PASSWORD="${FIREBASE_AUTH_PASSWORD}" \
                 -e FIREBASE_BUCKET="${FIREBASE_BUCKET}" \
                 -e VNPaySettings__Version="${VNPaySettings__Version}" \
-                -d --name flocalbrandapi -p 8082:8080 -p 8083:8081 chalsfptu/flocalbrandapi'''
+                -d --name fjourneyapi -p 8082:8080 -p 8083:8081 chalsfptu/fjourneyapi'''
         }
     }
 }
