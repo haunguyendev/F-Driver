@@ -1,5 +1,6 @@
 ﻿using F_Driver.API.Middleware;
 using F_Driver.DataAccessObject.Models;
+using F_Driver.Helpers;
 using F_Driver.Repository;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Repository.Repositories;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace F_Driver.API.Extensions
 {
@@ -24,7 +26,10 @@ namespace F_Driver.API.Extensions
           
         
             services.AddScoped<ExceptionMiddleware>();
-            services.AddControllers();
+            services.AddControllers()
+                    .AddJsonOptions(x =>
+                        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); // Ngăn không tuần tự hóa vòng lặp
+
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.AddMemoryCache();
             services.AddEndpointsApiExplorer();
@@ -82,6 +87,57 @@ namespace F_Driver.API.Extensions
                 });
             services.AddAuthorization();
 
+            services.AddSwaggerGen(option =>
+            {
+                option.SwaggerDoc("v1", new OpenApiInfo { Title = "FLocalBrand API", Version = "v1" });
+                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter a valid token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer"
+                });
+                option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+            });
+            services.AddCors(option =>
+                option.AddPolicy("CORS", builder =>
+                    builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()));
+
+            //services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            //Get config mail form environment
+            services.Configure<MailSettings>(options =>
+            {
+                options.Server = Environment.GetEnvironmentVariable("MailSettings__Server");
+                options.Port = int.Parse(Environment.GetEnvironmentVariable("MailSettings__Port") ?? "0");
+                options.SenderName = Environment.GetEnvironmentVariable("MailSettings__SenderName");
+                options.SenderEmail = Environment.GetEnvironmentVariable("MailSettings__SenderEmail");
+                options.UserName = Environment.GetEnvironmentVariable("MailSettings__UserName");
+                options.Password = Environment.GetEnvironmentVariable("MailSettings__Password");
+            });
+
+
+            services.Configure<FirebaseSettings>(config =>
+            {
+                config.ApiKey = Environment.GetEnvironmentVariable("FIREBASE_API_KEY");
+                config.AuthEmail = Environment.GetEnvironmentVariable("FIREBASE_AUTH_EMAIL");
+                config.AuthPassword = Environment.GetEnvironmentVariable("FIREBASE_AUTH_PASSWORD");
+                config.Bucket = Environment.GetEnvironmentVariable("FIREBASE_BUCKET");
+            });
 
 
 
@@ -170,6 +226,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<WalletService>()
                 .AddScoped<FeedbackService>()
                 .AddScoped<ZoneService>()
+                .AddScoped<FirebaseService>()
            //Add repository
                 .AddScoped<ICancellationReasonRepository,CancellationReasonRepository>()
                 .AddScoped<ICancellationRepository, CancellationRepository>()
