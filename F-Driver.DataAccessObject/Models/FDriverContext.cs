@@ -195,7 +195,7 @@ public partial class FDriverContext : DbContext
 
             entity.HasOne(d => d.User).WithOne(p => p.Wallet)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__Wallets__UserId__75A278F5");
+                .HasConstraintName("FK__Wallets__UserId__75A278F5"); 
         });
 
         modelBuilder.Entity<Zone>(entity =>

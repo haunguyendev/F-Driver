@@ -9,11 +9,11 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="Shared\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.68.0.1869" />
   </ItemGroup>
 
   <ItemGroup>
