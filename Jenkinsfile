@@ -70,7 +70,7 @@ pipeline {
                 -e FIREBASE_AUTH_EMAIL="${FIREBASE_AUTH_EMAIL}" \
                 -e FIREBASE_AUTH_PASSWORD="${FIREBASE_AUTH_PASSWORD}" \
                 -e FIREBASE_BUCKET="${FIREBASE_BUCKET}" \
-                -d --name fjourneyapi -p 8082:8080 -p 8084:8081 chalsfptu/fjourneyapi'''
+                -d --name fjourneyapi -p 8083:8080 -p 8084:8081 chalsfptu/fjourneyapi'''
         }
     }
 }
