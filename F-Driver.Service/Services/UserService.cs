@@ -5,6 +5,7 @@ using F_Driver.Repository.Interfaces;
 using F_Driver.Repository.Repositories;
 using F_Driver.Service.BusinessModels;
 using FirebaseAdmin.Messaging;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,16 +159,9 @@ namespace F_Driver.Service.Services
         #endregion
 
         #region get update verify status user
-        public List<string> HandleStatusVerifyCodes(List<int> errorCodes, int userId)
+        public async Task<List<string>> HandleStatusVerifyCodes(List<int> errorCodes, int userId)
         {
-            var user = _unitOfWork.Users.FindByCondition(
-    u => u.Id == userId,
-    trackChanges: false,
-    includeProperties: new Expression<Func<User, object>>[]
-    {
-        u => u.Driver,
-        u => u.Driver.Vehicles
-    }).FirstOrDefault();
+            var user = await _unitOfWork.Users.FindByCondition(u => u.Id == userId).FirstOrDefaultAsync();
             // Check if the list contains the success code (0)
             if (errorCodes.Contains(0) && errorCodes.Count > 1)
             {
@@ -175,16 +169,40 @@ namespace F_Driver.Service.Services
                 throw new InvalidOperationException("SUCCESS code cannot be combined with other error codes.");
             }
 
-            if(errorCodes.Contains(0))
+            if (errorCodes.Contains(0))
             {
-                user.Verified = true;
-                user.Driver.Verified = true;
-                user.Driver.Vehicles.ToList().ForEach(v => v.IsVerified = true);
-                user.VerificationStatus = "Verified";
-                _unitOfWork.Users.UpdateAsync(user);
-                _unitOfWork.CommitAsync();
+                if (user != null)
+                {
+                    user.Verified = true;
+                    user.VerificationStatus = "Verified";
+
+                    if (user.Driver != null)
+                    {
+                        user.Driver.Verified = true;
+
+                        if (user.Driver.Vehicles != null)
+                        {
+                            foreach (var vehicle in user.Driver.Vehicles)
+                            {
+                                vehicle.IsVerified = true;
+                            }
+                        }
+                    }
+                }
             }
-            // Otherwise, return details for the error codes
+            else
+            {
+                if (user != null)
+                {
+                    user.VerificationStatus = "Reject";
+                }
+            }
+
+            if (user != null)
+            {
+                await _unitOfWork.Users.UpdateAsync(user);
+                await _unitOfWork.CommitAsync();
+            }
             var errorDetails = new List<string>();
             foreach (var code in errorCodes)
             {
@@ -197,7 +215,7 @@ namespace F_Driver.Service.Services
                     errorDetails.Add("Unknown error code: " + code);
                 }
             }
-            SendMailAsync(user.Email, errorDetails);
+            await SendMailAsync(user.Email, errorDetails);
 
             return errorDetails;
         }
