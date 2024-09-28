@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "F-Driver.API", "F-Driver.API.csproj", "{9D5165EC-8AE7-4F4F-A870-1B66FC9F1B89}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D5165EC-8AE7-4F4F-A870-1B66FC9F1B89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D5165EC-8AE7-4F4F-A870-1B66FC9F1B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D5165EC-8AE7-4F4F-A870-1B66FC9F1B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D5165EC-8AE7-4F4F-A870-1B66FC9F1B89}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {70172B05-72C3-499B-ACD7-5432809F2508}
+	EndGlobalSection
+EndGlobal

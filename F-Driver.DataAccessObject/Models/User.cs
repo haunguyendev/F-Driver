@@ -49,6 +49,7 @@ public partial class User : EntityBase
 
     public bool? Verified { get; set; }
     public string? VerificationStatus { get; set; }
+    public bool? IsMailValid { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }

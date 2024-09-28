@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace F_Driver.Service.Settings
 {
-public class JwtSettings
-{
-    public string Key { get; set; } = null!;
-}
+    public class GoogleAuthSettings
+    {
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+    }
 }
