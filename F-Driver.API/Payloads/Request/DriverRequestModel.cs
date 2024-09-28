@@ -8,7 +8,8 @@ namespace F_Driver.API.Payloads.Request
         public int? UserId { get; set; }
         [Required]
         public string LicenseNumber { get; set; } = string.Empty;
-        public bool? Verified { get; set; }
+        [Required]
+        public bool Verified { get; set; }
         [Required]
         public IFormFile? LicenseImageUrl { get; set; }
 

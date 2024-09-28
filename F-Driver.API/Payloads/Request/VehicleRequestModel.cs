@@ -10,7 +10,8 @@ namespace F_Driver.API.Payloads.Request
         public string LicensePlate { get; set; } = string.Empty;
         [Required]
         public string VehicleType { get; set; } = string.Empty;
-        public bool? IsVerified { get; set; }
+        [Required]
+        public bool IsVerified { get; set; }
         [Required]
         public string Registration { get; set; } = string.Empty;
         [Required]

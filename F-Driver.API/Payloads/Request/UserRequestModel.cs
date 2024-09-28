@@ -24,7 +24,7 @@ namespace F_Driver.API.Payloads.Request
         public bool? Verified { get; set; }
         public string? VerificationStatus { get; set; }
         [Required]
-        public DriverRequestModel? Driver { get; set; }
+        public DriverRequestModel Driver { get; set; }
 
         [Required]
         public VehicleRequestModel? Vehicle { get; set; }

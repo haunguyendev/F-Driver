@@ -8,6 +8,7 @@ using FirebaseAdmin.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
@@ -159,7 +160,14 @@ namespace F_Driver.Service.Services
         #region get update verify status user
         public List<string> HandleStatusVerifyCodes(List<int> errorCodes, int userId)
         {
-            var user = _unitOfWork.Users.FindByCondition(u => u.Id == userId).FirstOrDefault();
+            var user = _unitOfWork.Users.FindByCondition(
+    u => u.Id == userId,
+    trackChanges: false,
+    includeProperties: new Expression<Func<User, object>>[]
+    {
+        u => u.Driver,
+        u => u.Driver.Vehicles
+    }).FirstOrDefault();
             // Check if the list contains the success code (0)
             if (errorCodes.Contains(0) && errorCodes.Count > 1)
             {
@@ -167,6 +175,15 @@ namespace F_Driver.Service.Services
                 throw new InvalidOperationException("SUCCESS code cannot be combined with other error codes.");
             }
 
+            if(errorCodes.Contains(0))
+            {
+                user.Verified = true;
+                user.Driver.Verified = true;
+                user.Driver.Vehicles.ToList().ForEach(v => v.IsVerified = true);
+                user.VerificationStatus = "Verified";
+                _unitOfWork.Users.UpdateAsync(user);
+                _unitOfWork.CommitAsync();
+            }
             // Otherwise, return details for the error codes
             var errorDetails = new List<string>();
             foreach (var code in errorCodes)

@@ -54,6 +54,24 @@ namespace F_Driver.API.Controllers
 
             try
             {
+                var check = userRequest.Verified.HasValue;
+                if (userRequest.Verified == true && !userRequest.VerificationStatus.Equals("Spending", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(new { message = "Verification status must be 'Spending' if user is verified" });
+                }
+                if (userRequest.Driver.Verified == true)
+                {
+                    return BadRequest(new { message = "Driver must be verified by admin" });
+                }
+                if (userRequest.Driver.Vehicles == null || !userRequest.Driver.Vehicles.Any(v => v.IsVerified))
+                {
+                    return BadRequest(new { message = "Driver must have at least one vehicle" });
+                }
+
+                if (userRequest.Driver.Vehicles.Any(v => v.IsVerified))
+                {
+                    return BadRequest(new { message = "Vehicles must be approved by admin before use." });
+                }
                 var createdUser = await _userService.CreateUserAsync(userRequest.MapToUserModel());
                 return Ok(new { message = "User created successfully"});
             }
