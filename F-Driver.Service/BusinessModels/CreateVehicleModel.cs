@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace F_Driver.Service.BusinessModels
 {
-    public class VehicleModel
+    public class CreateVehicleModel
     {
         public int Id { get; set; }
 
@@ -18,7 +18,7 @@ namespace F_Driver.Service.BusinessModels
 
         public string VehicleType { get; set; } = string.Empty;
 
-        public bool? IsVerified { get; set; }
+        public bool IsVerified { get; set; } = false;
 
 
         public string Registration { get; set; } = string.Empty;

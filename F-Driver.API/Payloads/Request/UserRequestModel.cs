@@ -9,6 +9,9 @@ namespace F_Driver.API.Payloads.Request
         public string Name { get; set; } = string.Empty;
         [Required]
         public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public bool IsMailValid { get; set; } = false;
         [Required]
         public string PhoneNumber { get; set; } = string.Empty;
         [Required]
@@ -21,16 +24,16 @@ namespace F_Driver.API.Payloads.Request
         public string Role { get; set; } = string.Empty;
         [Required]
         public string? StudentId { get; set; }
-        public bool? Verified { get; set; }
-        public string? VerificationStatus { get; set; }
+        public bool Verified { get; set; } = false;
+        public string VerificationStatus { get; set; } = "Pending";
         [Required]
-        public DriverRequestModel? Driver { get; set; }
+        public DriverRequestModel Driver { get; set; } = new DriverRequestModel();
 
         [Required]
-        public VehicleRequestModel? Vehicle { get; set; }
+        public VehicleRequestModel Vehicle { get; set; } = new VehicleRequestModel();
 
-        public UserModel MapToUserModel() {             
-            var userModel = new UserModel
+        public CreateUserModel MapToUserModel() {             
+            var userModel = new CreateUserModel
             {
                 Name = Name,
                 Email = Email,
@@ -42,6 +45,7 @@ namespace F_Driver.API.Payloads.Request
                 StudentId = StudentId,
                 Verified = Verified,
                 VerificationStatus = VerificationStatus,
+                IsMailValid = IsMailValid
 
             };
             // If the role is "driver", map the Driver model

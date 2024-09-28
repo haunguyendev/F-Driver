@@ -10,7 +10,8 @@ namespace F_Driver.API.Payloads.Request
         public string LicensePlate { get; set; } = string.Empty;
         [Required]
         public string VehicleType { get; set; } = string.Empty;
-        public bool? IsVerified { get; set; }
+        [Required]
+        public bool IsVerified { get; set; } = false;
         [Required]
         public string Registration { get; set; } = string.Empty;
         [Required]
@@ -18,9 +19,9 @@ namespace F_Driver.API.Payloads.Request
         [Required]
         public IFormFile? RegistrationImageUrl { get; set; }
 
-        public VehicleModel MapToVehicleModel()
+        public CreateVehicleModel MapToVehicleModel()
         {
-            return new VehicleModel
+            return new CreateVehicleModel
             {
                 DriverId = DriverId,
                 LicensePlate = LicensePlate,

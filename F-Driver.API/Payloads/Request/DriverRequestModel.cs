@@ -8,22 +8,24 @@ namespace F_Driver.API.Payloads.Request
         public int? UserId { get; set; }
         [Required]
         public string LicenseNumber { get; set; } = string.Empty;
-        public bool? Verified { get; set; }
+        [Required]
+        public bool Verified { get; set; } = false;
         [Required]
         public IFormFile? LicenseImageUrl { get; set; }
 
         public List<VehicleRequestModel>? Vehicles { get; set; }
 
-        public DriverModel MapToDriverModel(VehicleRequestModel vehicleRequestModel)
+        public CreateDriverModel MapToDriverModel(VehicleRequestModel vehicleRequestModel)
         {
-            return new DriverModel
+            return new CreateDriverModel
             {
                 LicenseNumber = LicenseNumber,
                 Verified = Verified,
                 LicenseImageUrl = LicenseImageUrl,
+                UserId = UserId,
 
                 // Map Vehicles
-                Vehicles = new List<VehicleModel>
+                Vehicles = new List<CreateVehicleModel>
                 {
                     vehicleRequestModel.MapToVehicleModel() // Giả sử có phương thức này
                 }

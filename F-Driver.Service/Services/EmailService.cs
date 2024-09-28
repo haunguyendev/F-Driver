@@ -5,7 +5,7 @@ using MimeKit;
 using System;
 using System.Threading.Tasks;
 
-namespace F_Driver.Services
+namespace F_Driver.Service.Services
 {
     public class EmailService
     {
@@ -28,7 +28,7 @@ namespace F_Driver.Services
                     emailMessage.To.Add(emailTo);
                     emailMessage.Subject = mailData.EmailSubject;
                     var bodyBuilder = new BodyBuilder();
-                    bodyBuilder.HtmlBody = mailData.EmailBody;
+                    bodyBuilder.HtmlBody = mailData.EmailBody.Replace("\n", "<br>");
                     emailMessage.Body = bodyBuilder.ToMessageBody();
                     using (var client = new SmtpClient())
                     {
