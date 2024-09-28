@@ -9,7 +9,7 @@ namespace F_Driver.API.Payloads.Request
         [Required]
         public string LicenseNumber { get; set; } = string.Empty;
         [Required]
-        public bool Verified { get; set; }
+        public bool Verified { get; set; } = false;
         [Required]
         public IFormFile? LicenseImageUrl { get; set; }
 
@@ -22,6 +22,7 @@ namespace F_Driver.API.Payloads.Request
                 LicenseNumber = LicenseNumber,
                 Verified = Verified,
                 LicenseImageUrl = LicenseImageUrl,
+                UserId = UserId,
 
                 // Map Vehicles
                 Vehicles = new List<CreateVehicleModel>

@@ -54,10 +54,14 @@ namespace F_Driver.API.Controllers
 
             try
             {
-                var check = userRequest.Verified.HasValue;
-                if (userRequest.Verified == true && !userRequest.VerificationStatus.Equals("Spending", StringComparison.OrdinalIgnoreCase))
+                var check = userRequest.Verified;
+                if (userRequest.Verified == true && !userRequest.VerificationStatus.Equals("Pending", StringComparison.OrdinalIgnoreCase))
                 {
                     return BadRequest(new { message = "Verification status must be 'Spending' if user is verified" });
+                }
+                if (userRequest.IsMailValid == true)
+                {
+                    return BadRequest(new { message = "Mail validation must be verified by admin" });
                 }
                 if (userRequest.Driver.Verified == true)
                 {

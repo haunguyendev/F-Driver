@@ -16,6 +16,8 @@ namespace F_Driver.Service.BusinessModels
 
         public string Email { get; set; } = string.Empty;
 
+        public bool IsMailValid { get; set; } = false;
+
         public string PhoneNumber { get; set; } = string.Empty;
 
         public string PasswordHash { get; set; } = string.Empty;
@@ -28,7 +30,7 @@ namespace F_Driver.Service.BusinessModels
 
         public string? StudentId { get; set; }
 
-        public bool? Verified { get; set; }
+        public bool Verified { get; set; } = false;
 
         public string? VerificationStatus { get; set; }
 

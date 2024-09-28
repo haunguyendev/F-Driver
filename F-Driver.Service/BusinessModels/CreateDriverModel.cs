@@ -16,7 +16,7 @@ namespace F_Driver.Service.BusinessModels
 
         public string LicenseNumber { get; set; } = string.Empty;
 
-        public bool? Verified { get; set; }
+        public bool Verified { get; set; } = false;
 
         public IFormFile? LicenseImageUrl { get; set; }
 

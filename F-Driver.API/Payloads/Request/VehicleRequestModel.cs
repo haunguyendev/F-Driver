@@ -11,7 +11,7 @@ namespace F_Driver.API.Payloads.Request
         [Required]
         public string VehicleType { get; set; } = string.Empty;
         [Required]
-        public bool IsVerified { get; set; }
+        public bool IsVerified { get; set; } = false;
         [Required]
         public string Registration { get; set; } = string.Empty;
         [Required]

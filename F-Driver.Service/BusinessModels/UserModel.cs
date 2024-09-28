@@ -15,6 +15,8 @@ namespace F_Driver.Service.BusinessModels
 
         public string Email { get; set; } = string.Empty;
 
+        public bool IsMailValid { get; set; } = false;
+
         public string PhoneNumber { get; set; } = string.Empty;
 
         public string PasswordHash { get; set; } = string.Empty;
