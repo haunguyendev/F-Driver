@@ -2,8 +2,8 @@
 using F_Driver.API.Payloads.Request;
 using F_Driver.API.Payloads.Response;
 using F_Driver.Helpers;
+using F_Driver.Service.BusinessModels;
 using F_Driver.Service.Services;
-using F_Driver.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -87,6 +87,7 @@ namespace F_Driver.API.Controllers
                         var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Email not found. Please initiate the forget password process first."));
                         return NotFound(result);
                     }
+                    _cache.Remove(request.Email);
                 }
 
                 await SendOtpAsync(request.Email, request.IsResend ? "Resend OTP" : "Reset Password OTP");
@@ -114,6 +115,29 @@ namespace F_Driver.API.Controllers
                 return Ok(response);
             }
             return Unauthorized(ApiResult<SendOtpResponse>.Succeed(new SendOtpResponse { Message = "Invalid OTP" }));
+        }
+
+        [HttpPost("change-status")]
+        public IActionResult HandleStatusCodes([FromBody] ErrorRequest request)
+        {
+            try
+            {
+                var user = _userService.GetUserById(request.UserId).Result;
+                if (user == null)
+                {
+                    return NotFound(ApiResult<Dictionary<string, string[]>>.Fail(new Exception("User not found")));
+                }
+                // Call the service to handle error codes
+                var errorDetails = _userService.HandleStatusVerifyCodes(request.ErrorCodes, request.UserId);
+
+                // Return the response with user ID and error details
+                return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails}));
+            }
+            catch (InvalidOperationException ex)
+            {
+                // If there's an invalid combination of error codes, return a bad request
+                return BadRequest(ApiResult<Dictionary<string, string[]>>.Fail(new Exception(ex.Message)));
+            }
         }
     }
 }

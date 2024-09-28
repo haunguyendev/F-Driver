@@ -18,9 +18,9 @@ namespace F_Driver.API.Payloads.Request
         [Required]
         public IFormFile? RegistrationImageUrl { get; set; }
 
-        public VehicleModel MapToVehicleModel()
+        public CreateVehicleModel MapToVehicleModel()
         {
-            return new VehicleModel
+            return new CreateVehicleModel
             {
                 DriverId = DriverId,
                 LicensePlate = LicensePlate,

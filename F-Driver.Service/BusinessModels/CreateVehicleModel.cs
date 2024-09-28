@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace F_Driver.Service.BusinessModels
 {
-    public class VehicleModel
+    public class CreateVehicleModel
     {
         public int Id { get; set; }
 

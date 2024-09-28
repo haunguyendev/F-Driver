@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace F_Driver.Service.BusinessModels
 {
-    public class DriverModel
+    public class CreateDriverModel
     {
         public int Id { get; set; }
 
@@ -25,6 +25,6 @@ namespace F_Driver.Service.BusinessModels
         //public List<FeedbackBusinessModel> Feedbacks { get; set; } = new List<FeedbackBusinessModel>();
         //public List<PaymentBusinessModel> Payments { get; set; } = new List<PaymentBusinessModel>();
         
-        public List<VehicleModel> Vehicles { get; set; } = new List<VehicleModel>();
+        public List<CreateVehicleModel> Vehicles { get; set; } = new List<CreateVehicleModel>();
     }
 }

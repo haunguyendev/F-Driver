@@ -29,8 +29,8 @@ namespace F_Driver.API.Payloads.Request
         [Required]
         public VehicleRequestModel? Vehicle { get; set; }
 
-        public UserModel MapToUserModel() {             
-            var userModel = new UserModel
+        public CreateUserModel MapToUserModel() {             
+            var userModel = new CreateUserModel
             {
                 Name = Name,
                 Email = Email,

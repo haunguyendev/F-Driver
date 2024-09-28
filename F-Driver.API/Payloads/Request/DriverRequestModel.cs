@@ -14,16 +14,16 @@ namespace F_Driver.API.Payloads.Request
 
         public List<VehicleRequestModel>? Vehicles { get; set; }
 
-        public DriverModel MapToDriverModel(VehicleRequestModel vehicleRequestModel)
+        public CreateDriverModel MapToDriverModel(VehicleRequestModel vehicleRequestModel)
         {
-            return new DriverModel
+            return new CreateDriverModel
             {
                 LicenseNumber = LicenseNumber,
                 Verified = Verified,
                 LicenseImageUrl = LicenseImageUrl,
 
                 // Map Vehicles
-                Vehicles = new List<VehicleModel>
+                Vehicles = new List<CreateVehicleModel>
                 {
                     vehicleRequestModel.MapToVehicleModel() // Giả sử có phương thức này
                 }

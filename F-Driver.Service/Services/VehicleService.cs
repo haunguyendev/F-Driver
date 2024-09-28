@@ -22,11 +22,11 @@ namespace F_Driver.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<List<VehicleModel>> CreateVehiclesAsync(List<VehicleModel> vehicleRequests, int driverId)
+        public async Task<List<CreateVehicleModel>> CreateVehiclesAsync(List<CreateVehicleModel> vehicleRequests, int driverId)
         {
             if (vehicleRequests == null || !vehicleRequests.Any())
             {
-                return new List<VehicleModel>();
+                return new List<CreateVehicleModel>();
             }
             foreach (var vehicleRequest in vehicleRequests)
             {
