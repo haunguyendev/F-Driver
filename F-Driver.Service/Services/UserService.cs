@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using F_Driver.DataAccessObject.Models;
+using F_Driver.Helpers;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Repository.Repositories;
 using F_Driver.Service.BusinessModels;
@@ -26,6 +27,7 @@ namespace F_Driver.Service.Services
             _firebaseService = firebaseService;
         }
 
+        #region create user is a driver
         public async Task<bool> CreateUserAsync(UserModel userRequest)
         {
             try
@@ -58,7 +60,7 @@ namespace F_Driver.Service.Services
                         var vehiclesList = user.Driver.Vehicles.ToList(); 
                         for (int i = 0; i < userRequest.Driver.Vehicles.Count; i++)
                         {
-                            userRequest.Driver.Vehicles.ElementAt(i).Id = vehiclesList[i].Id; 
+                            userRequest.Driver.Vehicles.ElementAt(i).Id = vehiclesList[i].Id;
                         }
                     }
                 }
@@ -121,9 +123,21 @@ namespace F_Driver.Service.Services
                 throw;
             }
         }
+        #endregion
 
-
-
-
+        #region get user by id
+        public async Task<UserModel?> GetUserById(int id)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            if (user != null)
+            {
+                return _mapper.Map<UserModel>(user);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        #endregion
     }
 }

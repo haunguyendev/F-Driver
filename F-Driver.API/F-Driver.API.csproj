@@ -19,8 +19,4 @@
     <ProjectReference Include="..\F-Driver.Service\F-Driver.Service.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Payloads\Response\" />
-  </ItemGroup>
-
 </Project>
