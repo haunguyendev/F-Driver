@@ -45,7 +45,7 @@ namespace F_Driver.API.Controllers
             var zone = await _zoneService.CreateZone(zoneRequest.MapToZoneModel());
             if (!zone)
             {
-                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Create zone is unsuccessful."));
+                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Create zone is unsuccessful because some error or Zone name is exist"));
                 return BadRequest(result);
             }
             return Created();
@@ -63,7 +63,7 @@ namespace F_Driver.API.Controllers
             var zone = await _zoneService.UpdateZone(zoneId, zoneRequest.MapToZoneModel());
             if (zone == null)
             {
-                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Zone not found."));
+                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Zone not found or Zone name is exist"));
                 return NotFound(result);
             }
             return Ok(ApiResult<ZoneResponse>.Succeed(new ZoneResponse { Zone = zone }));

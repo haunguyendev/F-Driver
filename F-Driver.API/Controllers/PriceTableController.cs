@@ -43,7 +43,7 @@ namespace F_Driver.API.Controllers
             var priceTable = await _priceTableService.CreatePriceTable(priceTableRequest.MapToTableModel());
             if (!priceTable)
             {
-                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Create price table is unsuccessful."));
+                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Create price table is unsuccessful or fromZoneId and toZoneId is duplicate"));
                 return BadRequest(result);
             }
                 return Created();
@@ -62,10 +62,28 @@ namespace F_Driver.API.Controllers
             var priceTable = await _priceTableService.UpdatePriceTable(priceTableId, priceTableRequest.MapToTableModel());
             if (priceTable == null)
             {
-                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Price table not found."));
+                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Price table not found or fromZoneId and toZoneId is duplicate"));
                 return NotFound(result);
             }
             return Ok(ApiResult<PriceTableResponse>.Succeed(new PriceTableResponse { PriceTable = priceTable }));
+        }
+
+        //Get price table by ZoneFrom and ZoneTo
+        [HttpGet("from/{zoneFromId}/to/{zoneToId}")]
+        public async Task<IActionResult> GetByZoneFromAndZoneTo(int zoneToId, int zoneFromId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var priceTable = await _priceTableService.GetPriceTableByZoneFromAndZoneTo(zoneFromId, zoneToId);
+            if (priceTable == null)
+            {
+                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Price table not found."));
+                return NotFound(result);
+            }    
+            return Ok(ApiResult<PriceTableResponse>.Succeed(new PriceTableResponse { PriceTable = priceTable }));
+
         }
     }
 }

@@ -2,6 +2,7 @@
 using F_Driver.DataAccessObject.Models;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Service.BusinessModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +23,15 @@ namespace F_Driver.Service.Services
             _mapper = mapper;
         }
 
-
+        
         //Create zone
         public async Task<bool> CreateZone(ZoneModel zoneModel)
         {
+            var existingZone = await _unitOfWork.Zones.FindAllAsync(zone => zone.ZoneName == zoneModel.ZoneName);
+            if (existingZone.Count()> 0)
+            {
+                return false;
+            }
             var zone = _mapper.Map<Zone>(zoneModel);
             await _unitOfWork.Zones.CreateAsync(zone);
             var rs = await _unitOfWork.CommitAsync();
@@ -34,13 +40,19 @@ namespace F_Driver.Service.Services
                 return true;
             }
             return false;
-
         }
 
         //Update zone
-        public async Task<ZoneModel> UpdateZone(int zoneId ,ZoneModel zoneModel)
+        public async Task<ZoneModel?> UpdateZone(int zoneId ,ZoneModel zoneModel)
         {
-            var zone = _unitOfWork.Zones.GetByIdAsync(zoneId);
+            var existingZone = await _unitOfWork.Zones
+                    .FindByCondition(z => z.ZoneName == zoneModel.ZoneName && z.Id != zoneId).FirstOrDefaultAsync();
+
+            if (existingZone != null)
+            {
+                return null;
+            }
+            var zone = await _unitOfWork.Zones.GetByIdAsync(zoneId);
             if (zone == null)
             {
                 return null;

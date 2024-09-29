@@ -2,6 +2,7 @@
 using F_Driver.DataAccessObject.Models;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Service.BusinessModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,11 @@ namespace F_Driver.Service.Services
         //Create price table
         public async Task<bool> CreatePriceTable(PriceTableModel priceTableModel)
         {
+            var priceTableExist = await _unitOfWork.PriceTables.FindByCondition(p => p.FromZoneId == priceTableModel.FromZoneId && p.ToZoneId == priceTableModel.ToZoneId).FirstOrDefaultAsync();
+            if (priceTableExist != null)
+            {
+                return false;
+            }
             var priceTable = _mapper.Map<PriceTable>(priceTableModel);
             await _unitOfWork.PriceTables.CreateAsync(priceTable);
             var rs = await _unitOfWork.CommitAsync();
@@ -40,7 +46,12 @@ namespace F_Driver.Service.Services
 
         public async Task<PriceTableModel?> UpdatePriceTable(int priceTableId, PriceTableModel priceTableModel)
         {
-            var priceTable = _unitOfWork.PriceTables.GetByIdAsync(priceTableId);
+            var priceTableExist = await _unitOfWork.PriceTables.FindByCondition(p => p.FromZoneId == priceTableModel.FromZoneId && p.ToZoneId == priceTableModel.ToZoneId && p.Id != priceTableId).FirstOrDefaultAsync();
+            if (priceTableExist != null)
+            {
+                return null;
+            }
+            var priceTable = await _unitOfWork.PriceTables.GetByIdAsync(priceTableId);
             if (priceTable == null)
             {
                 return null;
@@ -55,6 +66,17 @@ namespace F_Driver.Service.Services
         public async Task<PriceTableModel?> GetPriceTableById(int priceTableId)
         {
             var priceTable = await _unitOfWork.PriceTables.GetByIdAsync(priceTableId);
+            if (priceTable == null)
+            {
+                return null;
+            }
+            return _mapper.Map<PriceTableModel>(priceTable);
+        }
+
+        //Get price table by ZoneFrom and ZoneTo
+        public async Task<PriceTableModel?> GetPriceTableByZoneFromAndZoneTo(int zoneFromId, int zoneToId)
+        {
+            var priceTable = await _unitOfWork.PriceTables.FindByCondition(z => z.FromZoneId == zoneFromId && z.ToZoneId == zoneToId).FirstOrDefaultAsync();
             if (priceTable == null)
             {
                 return null;
