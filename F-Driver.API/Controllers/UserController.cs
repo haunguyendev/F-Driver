@@ -140,17 +140,17 @@ namespace F_Driver.API.Controllers
         }
 
         [HttpPost("change-status")]
-        public IActionResult HandleStatusCodes([FromBody] ErrorRequest request)
+        public async Task<IActionResult> HandleStatusCodes([FromBody] ErrorRequest request)
         {
             try
             {
-                var user = _userService.GetUserById(request.UserId).Result;
+                var user = await _userService.GetUserById(request.UserId);
                 if (user == null)
                 {
                     return NotFound(ApiResult<Dictionary<string, string[]>>.Fail(new Exception("User not found")));
                 }
                 // Call the service to handle error codes
-                var errorDetails = _userService.HandleStatusVerifyCodes(request.ErrorCodes, request.UserId);
+                var errorDetails = await _userService.HandleStatusVerifyCodes(request.ErrorCodes, request.UserId);
 
                 // Return the response with user ID and error details
                 return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails}));
