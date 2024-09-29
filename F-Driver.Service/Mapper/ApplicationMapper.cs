@@ -14,19 +14,21 @@ namespace F_Driver.Service.Mapper
         public ApplicationMapper()
         {
             // Mapping for UserModel <-> User
-            CreateMap<UserModel, User>()
+            CreateMap<CreateUserModel, User>()
                 .ForMember(dest => dest.Driver, opt => opt.MapFrom(src => src.Driver)) // Ensure Driver is mapped correctly
                 .ReverseMap()
                 .MaxDepth(1); // Limit recursion depth if needed
 
             // Mapping for DriverModel <-> Driver
-            CreateMap<DriverModel, Driver>()
+            CreateMap<CreateDriverModel, Driver>()
                 .ForMember(dest => dest.Vehicles, opt => opt.MapFrom(src => src.Vehicles)) // Ensure Vehicles are mapped
                 .ReverseMap()
                 .MaxDepth(1); // Limit recursion depth if needed
 
             // Mapping for VehicleModel <-> Vehicle
-            CreateMap<VehicleModel, Vehicle>().ReverseMap();
+            CreateMap<CreateVehicleModel, Vehicle>().ReverseMap();
+
+            CreateMap<UserModel,User>().ReverseMap();
         }
     }
 }

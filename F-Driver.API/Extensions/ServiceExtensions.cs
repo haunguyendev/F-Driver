@@ -173,6 +173,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<FeedbackService>()
                 .AddScoped<ZoneService>()
                 .AddScoped<FirebaseService>()
+                .AddScoped<EmailService>()
            //Add repository
                 .AddScoped<ICancellationReasonRepository,CancellationReasonRepository>()
                 .AddScoped<ICancellationRepository, CancellationRepository>()
