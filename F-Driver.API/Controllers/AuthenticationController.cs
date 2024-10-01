@@ -22,7 +22,41 @@ namespace F_Driver.API.Controllers
             _userService = userService; 
             
         }
+        #region api login for driver
+        [AllowAnonymous]
+        [HttpPost("login-driver")]
+        public async Task<IActionResult> LoginDriver([FromBody] LoginRequest request)
+        {
+            try
+            {
+                var res =  _identityService.LoginDriver(request.Username, request.Password);
 
+                if (!res.Authenticated)
+                {                  
+                    var resultFail = new LoginResponse
+                    {
+                        AccessToken = null,
+                        RefreshToken = null
+                    };                   
+                    return BadRequest(ApiResult<LoginResponse>.Fail(new Exception("Login failed. Please check your credentials or verify if the account is a driver.")));
+                }
+             
+                var handler = new JwtSecurityTokenHandler();
+                var result = new LoginResponse
+                {
+                    AccessToken = handler.WriteToken(res.Token),
+                    RefreshToken = handler.WriteToken(res.RefreshToken)
+                };
+
+                return Ok(ApiResult<LoginResponse>.Succeed(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult<string>.Fail(ex));
+            }
+        }
+
+        #endregion
 
         [AllowAnonymous]
         [HttpPost("google-login-passenger")]

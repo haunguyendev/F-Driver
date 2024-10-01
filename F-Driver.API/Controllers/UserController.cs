@@ -3,6 +3,7 @@ using F_Driver.API.Payloads.Request;
 using F_Driver.API.Payloads.Response;
 using F_Driver.Helpers;
 using F_Driver.Service.BusinessModels;
+using F_Driver.Service.BusinessModels.QueryParameters;
 using F_Driver.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -140,7 +141,7 @@ namespace F_Driver.API.Controllers
         }
 
         [HttpPost("change-status")]
-        public IActionResult HandleStatusCodes([FromBody] ErrorRequest request)
+        public async Task<IActionResult> HandleStatusCodes([FromBody] ErrorRequest request)
         {
             try
             {
@@ -150,7 +151,7 @@ namespace F_Driver.API.Controllers
                     return NotFound(ApiResult<Dictionary<string, string[]>>.Fail(new Exception("User not found")));
                 }
                 // Call the service to handle error codes
-                var errorDetails = _userService.HandleStatusVerifyCodes(request.ErrorCodes, request.UserId);
+                var errorDetails = await _userService.HandleStatusVerifyCodes(request.ErrorCodes, request.UserId);
 
                 // Return the response with user ID and error details
                 return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails}));
@@ -161,5 +162,34 @@ namespace F_Driver.API.Controllers
                 return BadRequest(ApiResult<Dictionary<string, string[]>>.Fail(new Exception(ex.Message)));
             }
         }
+
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers([FromQuery] UserQueryParameters parameters)
+        {
+            try
+            {
+                // Gọi phương thức từ service để lấy danh sách người dùng theo bộ lọc
+                var users = await _userService.GetUsersAsync(parameters);
+
+                // Chuẩn bị đối tượng trả về theo kiểu phân trang
+                var paginatedUsers = new PaginatedResult<UserModel>
+                {
+                    Page = parameters.Page,
+                    PageSize = parameters.PageSize,
+                    TotalItems = users.TotalCount,
+                    TotalPages = (int)Math.Ceiling(users.TotalCount / (double)parameters.PageSize),
+                    Data = users.Items
+                };
+
+                // Trả về kết quả thành công
+                return Ok(ApiResult<PaginatedResult<UserModel>>.Succeed(paginatedUsers));
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ
+                return BadRequest(ApiResult<string>.Fail(ex));
+            }
+        }
+
     }
 }

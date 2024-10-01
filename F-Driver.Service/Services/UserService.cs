@@ -4,6 +4,8 @@ using F_Driver.Helpers;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Repository.Repositories;
 using F_Driver.Service.BusinessModels;
+using F_Driver.Service.BusinessModels.QueryParameters;
+using F_Driver.Service.Helpers;
 using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -241,6 +243,76 @@ namespace F_Driver.Service.Services
                 return false;
             }
         }
+        #endregion
+
+        #region get users async
+        public async Task<PaginatedList<UserModel>> GetUsersAsync(UserQueryParameters parameters)
+        {
+            // Query cơ bản
+            var query =  _unitOfWork.Users.FindAll();
+
+            // Tìm kiếm theo tên, email, hoặc số điện thoại
+            if (!string.IsNullOrWhiteSpace(parameters.Search))
+            {
+                query = query.Where(u => u.Name.Contains(parameters.Search) ||
+                                         u.Email.Contains(parameters.Search) ||
+                                         u.PhoneNumber.Contains(parameters.Search));
+            }
+
+            // Lọc theo email
+            if (!string.IsNullOrWhiteSpace(parameters.Email))
+            {
+                query = query.Where(u => u.Email == parameters.Email);
+            }
+
+            // Lọc theo số điện thoại
+            if (!string.IsNullOrWhiteSpace(parameters.PhoneNumber))
+            {
+                query = query.Where(u => u.PhoneNumber == parameters.PhoneNumber);
+            }
+
+            // Lọc theo role
+            if (!string.IsNullOrWhiteSpace(parameters.Role))
+            {
+                query = query.Where(u => u.Role == parameters.Role);
+            }
+
+            // Lọc theo trạng thái xác thực
+            if (!string.IsNullOrWhiteSpace(parameters.VerificationStatus))
+            {
+                query = query.Where(u => u.VerificationStatus == parameters.VerificationStatus);
+            }
+
+            // Sắp xếp theo trường và thứ tự
+            if (!string.IsNullOrWhiteSpace(parameters.Sort))
+            {
+                var sortBy = parameters.Sort;
+                var sortOrder = parameters.SortOrder?.ToLower() == "desc" ? "desc" : "asc";
+
+                query = sortOrder == "desc" ? query.OrderByDescending(u => EF.Property<object>(u, sortBy))
+                                            : query.OrderBy(u => EF.Property<object>(u, sortBy));
+            }
+            else
+            {
+                // Sắp xếp mặc định theo Name nếu không có tham số Sort
+                query = query.OrderBy(u => u.Name);
+            }
+
+            // Tính toán số lượng phần tử
+            var totalCount = await query.CountAsync();
+
+            // Phân trang
+            var users = await query.Skip((parameters.Page - 1) * parameters.PageSize)
+                                   .Take(parameters.PageSize)
+                                   .ToListAsync();
+
+            // Map User entity sang UserDto (nếu cần)
+            var userDtos = _mapper.Map<List<UserModel>>(users);
+
+            // Trả về kết quả phân trang
+            return new PaginatedList<UserModel>(userDtos, totalCount, parameters.Page, parameters.PageSize);
+        }
+
         #endregion
     }
 }
