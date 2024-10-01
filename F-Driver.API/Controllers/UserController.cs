@@ -163,7 +163,7 @@ namespace F_Driver.API.Controllers
             }
         }
 
-        [HttpGet("users")]
+        [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] UserQueryParameters parameters)
         {
             try
