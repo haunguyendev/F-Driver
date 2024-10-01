@@ -24,7 +24,7 @@ namespace F_Driver.Service.Services
             _vehicleService = vehicleService;
         }
 
-        public async Task<DriverModel> CreateDriverAsync(DriverModel driverRequest, int userId)
+        public async Task<CreateDriverModel> CreateDriverAsync(CreateDriverModel driverRequest, int userId)
         {
             var driver = _mapper.Map<Driver>(driverRequest);
             driver.UserId = userId;
@@ -33,18 +33,18 @@ namespace F_Driver.Service.Services
             var createdDriver = await _unitOfWork.Driver.CreateAsync(driver);
             var result = await _unitOfWork.CommitAsync();
 
-            List<VehicleModel> vehicles = null;
+            List<CreateVehicleModel> vehicles = null;
 
             if (driverRequest.Vehicles != null && driverRequest.Vehicles.Any())
             {
                 vehicles = await _vehicleService.CreateVehiclesAsync(driverRequest.Vehicles, driver.Id);
             }
 
-            var driverModel = _mapper.Map<DriverModel>(createdDriver);
+            var driverModel = _mapper.Map<CreateDriverModel>(createdDriver);
 
             if (vehicles != null)
             {
-                driverModel.Vehicles = _mapper.Map<List<VehicleModel>>(vehicles);
+                driverModel.Vehicles = _mapper.Map<List<CreateVehicleModel>>(vehicles);
             }
 
             return driverModel;

@@ -12,9 +12,6 @@ public partial class TripRequest : EntityBase
 
     public int? UserId { get; set; }
 
-    [StringLength(20)]
-    [Unicode(false)]
-    public string Role { get; set; } = null!;
 
     public int FromZoneId { get; set; }
 

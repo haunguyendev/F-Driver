@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using F_Driver.DataAccessObject.Models;
+using F_Driver.Helpers;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Service.BusinessModels;
 using F_Driver.Service.Settings;
@@ -32,7 +33,60 @@ namespace F_Driver.Service.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
+        #region login for driver
+        public LoginResult LoginDriver(string email, string password)
+        {
+            // Tìm người dùng bằng email
+            var user = _unitOfWork.Users.FindByCondition(c => c.Email == email).FirstOrDefault();
 
+            if (user is null)
+            {
+                // Trả về nếu không tìm thấy người dùng
+                return new LoginResult
+                {
+                    Authenticated = false,
+                    Token = null,
+                    RefreshToken = null,
+                    Message = "Email not found."
+                };
+            }
+
+            // Kiểm tra xem người dùng có phải tài xế không
+            if (!user.Role.Equals("Driver", StringComparison.OrdinalIgnoreCase))
+            {
+                return new LoginResult
+                {
+                    Authenticated = false,
+                    Token = null,
+                    RefreshToken = null,
+                    Message = "User is not a driver."
+                };
+            }
+
+            // Kiểm tra mật khẩu
+            var hash = SecurityUtil.Hash(password);
+            if (!user.PasswordHash.Equals(hash))
+            {
+                return new LoginResult
+                {
+                    Authenticated = false,
+                    Token = null,
+                    RefreshToken = null,
+                    Message = "Incorrect password."
+                };
+            }
+
+            // Đăng nhập thành công, trả về token
+            return new LoginResult
+            {
+                Authenticated = true,
+                Token = CreateJwtToken(user),
+                RefreshToken = CreateJwtRefreshToken(user)
+            };
+        }
+
+
+        #endregion
         #region login google
         public async Task<LoginResult> LoginGooglePassenger(string token)
         {
@@ -59,7 +113,7 @@ namespace F_Driver.Service.Services
                         Name = userInfo.Name,
                         Email = userInfo.Email,
                         ProfileImageUrl = userInfo.Picture,
-                        Role = "passenger", // Gán role là passenger
+                        Role = "Passenger", 
                         Verified = false,
                         VerificationStatus = "Pending",
                         CreatedAt = DateTime.Now
@@ -73,14 +127,16 @@ namespace F_Driver.Service.Services
                 
 
                 // Tạo JWT Token và Refresh Token cho người dùng
-                var tokenResponse = CreateJwtTokenPassenger(user);
-                var tokenRefreshResponse = CreateJwtRefreshTokenPassenger(user);
+                var tokenResponse = CreateJwtToken(user);
+                var tokenRefreshResponse = CreateJwtRefreshToken(user);
 
                 return new LoginResult
                 {
                     Authenticated = true,
                     Token = tokenResponse,
-                    RefreshToken = tokenRefreshResponse
+                    RefreshToken = tokenRefreshResponse,
+                    Message="Login Successfully!"
+                    
                 };
             }
             catch (Exception ex)
@@ -89,7 +145,9 @@ namespace F_Driver.Service.Services
                 {
                     Authenticated = false,
                     Token = null,
-                    RefreshToken = null
+                    RefreshToken = null,
+                    Message="Login failed!"
+                    
                 };
             }
         }
@@ -97,14 +155,14 @@ namespace F_Driver.Service.Services
         #endregion
 
         #region Create access token and refresh token for passengers
-        public SecurityToken CreateJwtTokenPassenger(User user)
+        public SecurityToken CreateJwtToken(User user)
         {
             var utcNow = DateTime.UtcNow;
             var authClaims = new List<Claim>
     {
         new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
         new(JwtRegisteredClaimNames.Email, user.Email),
-        new(ClaimTypes.Role, "Passenger"), //
+        new(ClaimTypes.Role, user.Role), //
         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
 
@@ -123,14 +181,14 @@ namespace F_Driver.Service.Services
             return token;
         }
 
-        private SecurityToken CreateJwtRefreshTokenPassenger(User user)
+        private SecurityToken CreateJwtRefreshToken(User user)
         {
             var utcNow = DateTime.UtcNow;
             var authClaims = new List<Claim>
     {
         new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
         new(JwtRegisteredClaimNames.Email, user.Email),
-        new(ClaimTypes.Role, "Passenger"),
+        new(ClaimTypes.Role, user.Role),
         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
 
