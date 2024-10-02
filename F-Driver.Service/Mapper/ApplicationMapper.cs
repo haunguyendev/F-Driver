@@ -29,6 +29,12 @@ namespace F_Driver.Service.Mapper
             CreateMap<CreateVehicleModel, Vehicle>().ReverseMap();
 
             CreateMap<UserModel,User>().ReverseMap();
+
+            CreateMap<ZoneModel, Zone>().ReverseMap();
+
+            CreateMap<PriceTableModel, PriceTable>().ReverseMap();
+
+            CreateMap<TripRequestModel, TripRequest>().ReverseMap();
         }
     }
 }

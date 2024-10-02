@@ -3,40 +3,44 @@ using System.ComponentModel.DataAnnotations;
 
 namespace F_Driver.API.Payloads.Request
 {
-    public class UserRequestModel
+    public class UpdatePassengerRequest
     {
         [Required]
+        public int Id { get; set; }
+
+        [Required]
         public string Name { get; set; } = string.Empty;
+
         [Required]
         [EmailAddress(ErrorMessage = "Invalid email address format.")]
         public string Email { get; set; } = string.Empty;
 
         [Required]
         public bool IsMailValid { get; set; } = false;
+
         [Required]
         [RegularExpression(@"^0\d{9}$", ErrorMessage = "Phone number must start with 0 and be exactly 10 digits long.")]
         public string PhoneNumber { get; set; } = string.Empty;
+        
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
-        [Required]
+
         public IFormFile? ProfileImageUrl { get; set; }
-        [Required]
+
         public IFormFile? StudentIdCardUrl { get; set; }
         [Required]
         public string Role { get; set; } = string.Empty;
+
         [Required]
         public string? StudentId { get; set; }
         public bool Verified { get; set; } = false;
         public string VerificationStatus { get; set; } = "Pending";
-        [Required]
-        public DriverRequestModel Driver { get; set; } = new DriverRequestModel();
 
-        [Required]
-        public VehicleRequestModel Vehicle { get; set; } = new VehicleRequestModel();
-
-        public CreateUserModel MapToUserModel() {             
+        public CreateUserModel MapToPassengerModel()
+        {
             var userModel = new CreateUserModel
             {
+                Id = Id,
                 Name = Name,
                 Email = Email,
                 PhoneNumber = PhoneNumber,
@@ -50,11 +54,6 @@ namespace F_Driver.API.Payloads.Request
                 IsMailValid = IsMailValid
 
             };
-            // If the role is "driver", map the Driver model
-            if (Role.ToLower() == "driver" && Driver != null)
-            {
-                userModel.Driver = Driver.MapToDriverModel(Vehicle);
-            }
             return userModel;
         }
     }
