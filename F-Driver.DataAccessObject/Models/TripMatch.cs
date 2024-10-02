@@ -13,7 +13,6 @@ public partial class TripMatch : EntityBase
 
     public int? DriverId { get; set; }       // Tài xế nào đang ghép cặp
 
-    public int? PassengerId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? MatchedAt { get; set; }
@@ -31,14 +30,11 @@ public partial class TripMatch : EntityBase
 
     [InverseProperty("Match")]
     public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
-    [ForeignKey("DriverId")]
-    [InverseProperty("TripMatches")]
-    public virtual Driver? Driver { get; set; }
 
     // Quan hệ với Passenger (User)
-    [ForeignKey("PassengerId")]
-    [InverseProperty("TripMatchesAsPassenger")]
-    public virtual User? Passenger { get; set; }
+    [ForeignKey("DriverId")]
+    [InverseProperty("TripMatchesAsDriver")]
+    public virtual User? Driver { get; set; }
     [ForeignKey("TripRequestId")]
     [InverseProperty("TripMatches")]
     public virtual TripRequest? TripRequest { get; set; }

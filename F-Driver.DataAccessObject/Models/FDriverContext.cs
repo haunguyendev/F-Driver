@@ -150,9 +150,8 @@ public partial class FDriverContext : DbContext
             entity.Property(e => e.MatchedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Status).HasDefaultValue("pending");
 
-            entity.HasOne(d => d.Driver).WithMany(p => p.TripMatches);
+            entity.HasOne(d => d.Driver).WithMany(p => p.TripMatchesAsDriver);
             
-            entity.HasOne(d => d.Passenger).WithMany(p => p.TripMatchesAsPassenger);
         });
 
         modelBuilder.Entity<TripRequest>(entity =>
