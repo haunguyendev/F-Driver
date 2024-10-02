@@ -15,6 +15,14 @@ public partial class FDriverContext : DbContext
     {
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Data Source=db.fjourney.site;Initial Catalog=F-Driver_ver2;User ID=SA;Password=<YourStrong@Passw0rda>;TrustServerCertificate=True");
+        }
+    }
+
     public virtual DbSet<Cancellation> Cancellations { get; set; }
 
     public virtual DbSet<CancellationReason> CancellationReasons { get; set; }
@@ -43,9 +51,9 @@ public partial class FDriverContext : DbContext
 
     public virtual DbSet<Zone> Zones { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-    }
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //{
+    //}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Cancellation>(entity =>
@@ -142,9 +150,9 @@ public partial class FDriverContext : DbContext
             entity.Property(e => e.MatchedAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Status).HasDefaultValue("pending");
 
-            entity.HasOne(d => d.DriverRequest).WithMany(p => p.TripMatchDriverRequests).HasConstraintName("FK__TripMatch__Drive__571DF1D5");
-
-            entity.HasOne(d => d.PassengerRequest).WithMany(p => p.TripMatchPassengerRequests).HasConstraintName("FK__TripMatch__Passe__5812160E");
+            entity.HasOne(d => d.Driver).WithMany(p => p.TripMatches);
+            
+            entity.HasOne(d => d.Passenger).WithMany(p => p.TripMatchesAsPassenger);
         });
 
         modelBuilder.Entity<TripRequest>(entity =>

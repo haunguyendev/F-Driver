@@ -6,9 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace F_Driver.DataAccessObject.Models;
 
-[Index("StudentId", Name = "UQ__Users__32C52B985591AF99", IsUnique = true)]
-[Index("PhoneNumber", Name = "UQ__Users__85FB4E3824AF3E00", IsUnique = true)]
-[Index("Email", Name = "UQ__Users__A9D1053460F37784", IsUnique = true)]
+
 public partial class User : EntityBase
 {
    
@@ -32,12 +30,12 @@ public partial class User : EntityBase
     [Column("ProfileImageURL")]
     [StringLength(255)]
     [Unicode(false)]
-    public string ProfileImageUrl { get; set; } = null!;
+    public string? ProfileImageUrl { get; set; } 
 
     [Column("StudentIdCardURL")]
     [StringLength(255)]
     [Unicode(false)]
-    public string StudentIdCardUrl { get; set; } = null!;
+    public string? StudentIdCardUrl { get; set; } 
 
     [StringLength(20)]
     [Unicode(false)]
@@ -50,6 +48,7 @@ public partial class User : EntityBase
     public bool? Verified { get; set; }
     public string? VerificationStatus { get; set; }
     public bool? IsMailValid { get; set; }
+    public string? DeviceId { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
@@ -68,6 +67,8 @@ public partial class User : EntityBase
 
     [InverseProperty("User")]
     public virtual ICollection<TripRequest> TripRequests { get; set; } = new List<TripRequest>();
+    [InverseProperty("Passenger")]
+    public virtual ICollection<TripMatch> TripMatchesAsPassenger { get; set; } = new List<TripMatch>();
 
     [InverseProperty("User")]
     public virtual Wallet? Wallet { get; set; }
