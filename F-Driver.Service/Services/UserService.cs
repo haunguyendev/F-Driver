@@ -314,5 +314,57 @@ namespace F_Driver.Service.Services
         }
 
         #endregion
+
+        #region update user passenger async
+        public async Task<bool> UpdateProfilePassenger(int id, CreateUserModel createUserModel)
+        {
+            try
+            {
+                var userInDb = await _unitOfWork.Users.GetByIdAsync(id);
+                if (userInDb == null)
+                {
+                    return false;
+                }
+                var profileImageUrl = userInDb.ProfileImageUrl;
+                var studentIdCardUrl = userInDb.StudentIdCardUrl;
+                //map createUserModel to userInDb
+                _mapper.Map(createUserModel, userInDb);
+
+                if (createUserModel.ProfileImageUrl != null && createUserModel.ProfileImageUrl.Length > 0)
+                {
+                    var profileImagePath = $"USER/{id}/ProfileImage";
+                    userInDb.ProfileImageUrl = await _firebaseService.UploadFileToFirebase(createUserModel.ProfileImageUrl, profileImagePath);
+                }
+                else
+                {
+                    userInDb.ProfileImageUrl = profileImageUrl;
+                }
+
+                if (createUserModel.StudentIdCardUrl != null && createUserModel.StudentIdCardUrl.Length > 0)
+                {
+                    var studentIdCardPath = $"USER/{id}/StudentIdCard";
+                    userInDb.StudentIdCardUrl = await _firebaseService.UploadFileToFirebase(createUserModel.StudentIdCardUrl, studentIdCardPath);
+                }
+                else
+                {
+                    userInDb.StudentIdCardUrl = studentIdCardUrl;
+                }
+                userInDb.CreatedAt = DateTime.Now;
+
+                await _unitOfWork.Users.UpdateAsync(userInDb);
+                var rs = await _unitOfWork.CommitAsync();
+                if (rs > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
+        }
+        #endregion
     }
 }

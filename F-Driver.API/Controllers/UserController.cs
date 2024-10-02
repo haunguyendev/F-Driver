@@ -78,7 +78,11 @@ namespace F_Driver.API.Controllers
                     return BadRequest(new { message = "Vehicles must be approved by admin before use." });
                 }
                 var createdUser = await _userService.CreateUserAsync(userRequest.MapToUserModel());
-                return Ok(new { message = "User created successfully"});
+                if (!createdUser)
+                {
+                    return BadRequest(new { message = "Something error!" });
+                }
+                return Ok(new { message = "User created successfully" });
             }
             catch (Exception ex)
             {
@@ -98,7 +102,7 @@ namespace F_Driver.API.Controllers
             var user = await _userService.GetUserById(request.UserId);
             if (user != null)
             {
-                if(user.Email != request.Email)
+                if (user.Email != request.Email)
                 {
                     var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Email does not match with the user."));
                     return BadRequest(result);
@@ -154,7 +158,7 @@ namespace F_Driver.API.Controllers
                 var errorDetails = await _userService.HandleStatusVerifyCodes(request.ErrorCodes, request.UserId);
 
                 // Return the response with user ID and error details
-                return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails}));
+                return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails }));
             }
             catch (InvalidOperationException ex)
             {
@@ -191,5 +195,42 @@ namespace F_Driver.API.Controllers
             }
         }
 
+        //update profile user is passenger
+        [HttpPut("passenger/{id}")]
+        public async Task<IActionResult> UpdateProfilePassenger(int id, [FromForm] UpdatePassengerRequest userRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                if(id != userRequest.Id)
+                {
+                    return BadRequest(new { message = "Id is not match" });
+                }
+                var user = await _userService.GetUserById(id);
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+                if (user.Role.ToLower() != "passenger")
+                {
+                    return BadRequest(new { message = "User is not a passenger" });
+                }
+                var updatedUser = await _userService.UpdateProfilePassenger(id, userRequest.MapToPassengerModel());
+                if (!updatedUser)
+                {
+                    return BadRequest(new { message = "Something error!" });
+                }
+                return Ok(new { message = "User updated successfully" });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
