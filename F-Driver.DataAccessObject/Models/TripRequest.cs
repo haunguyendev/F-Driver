@@ -15,7 +15,10 @@ public partial class TripRequest : EntityBase
 
     public int FromZoneId { get; set; }
 
+
     public int ToZoneId { get; set; }
+    [Column(TypeName = "decimal(10, 2)")]
+    public decimal? Price { get; set; }
 
     public DateOnly TripDate { get; set; }
 
