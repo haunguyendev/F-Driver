@@ -83,7 +83,20 @@ namespace F_Driver.API.Controllers
                 return NotFound(result);
             }    
             return Ok(ApiResult<PriceTableResponse>.Succeed(new PriceTableResponse { PriceTable = priceTable }));
+        }
 
+        //Delete price table
+        [HttpDelete("{priceTableId}")]
+        public async Task<IActionResult> DeletePriceTable(int priceTableId)
+        {
+            var priceTable = await _priceTableService.GetPriceTableById(priceTableId);
+            if (priceTable == null)
+            {
+                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Price table not found."));
+                return NotFound(result);
+            }
+            await _priceTableService.DeletePriceTable(priceTableId);
+            return NoContent();
         }
     }
 }

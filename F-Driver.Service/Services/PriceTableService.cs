@@ -83,5 +83,27 @@ namespace F_Driver.Service.Services
             }
             return _mapper.Map<PriceTableModel>(priceTable);
         }
+
+        //delete price table by id without using
+        /// <summary>
+        /// Chưa tính tới trường hơp có trip request mà chưa có giá ở đây, hoặc có rồi mà xóa giá
+        /// </summary>
+        /// <param name="priceTableId"></param>
+        /// <returns></returns>
+        public async Task<bool> DeletePriceTable(int priceTableId)
+        {
+            var priceTable = await _unitOfWork.PriceTables.GetByIdAsync(priceTableId);
+            if (priceTable == null)
+            {
+                return false;
+            }
+            await _unitOfWork.PriceTables.DeleteAsync(priceTable);
+            var rs = await _unitOfWork.CommitAsync();
+            if (rs > 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
