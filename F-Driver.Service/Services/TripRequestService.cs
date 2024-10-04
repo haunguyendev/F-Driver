@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using F_Driver.DataAccessObject.Models;
 using F_Driver.Repository.Interfaces;
+using F_Driver.Service.BuisnessModels.QueryParameters;
 using F_Driver.Service.BusinessModels;
+using F_Driver.Service.Helpers;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +69,72 @@ namespace F_Driver.Service.Services
                 return false;
 
             }
+        }
+
+        //get trips request with filter
+        public async Task<PaginatedList<TripRequestModel>> GetTripRequests(TripRequestQueryParameters filterRequest)
+        {
+            var query = _unitOfWork.TripRequests.FindAll();
+            if (filterRequest.UserId.HasValue)
+                query = query.Where(t => t.UserId == filterRequest.UserId.Value);
+
+            if (filterRequest.FromZoneId.HasValue)
+                query = query.Where(t => t.FromZoneId == filterRequest.FromZoneId.Value);
+
+            if (filterRequest.ToZoneId.HasValue)
+                query = query.Where(t => t.ToZoneId == filterRequest.ToZoneId.Value);
+
+            if (filterRequest.TripDate.HasValue)
+                query = query.Where(t => t.TripDate == filterRequest.TripDate.Value);
+
+            if (filterRequest.StartTime.HasValue)
+                query = query.Where(t => t.StartTime == filterRequest.StartTime.Value);
+
+            if (filterRequest.Slot.HasValue)
+                query = query.Where(t => t.Slot == filterRequest.Slot.Value);
+
+            if (!string.IsNullOrEmpty(filterRequest.Status))
+                query = query.Where(t => t.Status == filterRequest.Status);
+
+            if (filterRequest.CreatedAt.HasValue)
+                query = query.Where(t => t.CreatedAt == filterRequest.CreatedAt.Value);
+
+            if (!string.IsNullOrEmpty(filterRequest.SortBy))
+            {
+                switch (filterRequest.SortBy.ToLower())
+                {
+                    case "userid":
+                        query = filterRequest.IsAscending ? query.OrderBy(t => t.UserId) : query.OrderByDescending(t => t.UserId);
+                        break;
+                    case "fromzoneid":
+                        query = filterRequest.IsAscending ? query.OrderBy(t => t.FromZoneId) : query.OrderByDescending(t => t.FromZoneId);
+                        break;
+                    case "tozoneid":
+                        query = filterRequest.IsAscending ? query.OrderBy(t => t.ToZoneId) : query.OrderByDescending(t => t.ToZoneId);
+                        break;
+                    case "tripdate":
+                        query = filterRequest.IsAscending ? query.OrderBy(t => t.TripDate) : query.OrderByDescending(t => t.TripDate);
+                        break;
+                    case "starttime":
+                        query = filterRequest.IsAscending ? query.OrderBy(t => t.StartTime) : query.OrderByDescending(t => t.StartTime);
+                        break;
+                    case "slot":
+                        query = filterRequest.IsAscending ? query.OrderBy(t => t.Slot) : query.OrderByDescending(t => t.Slot);
+                        break;
+                    case "createdat":
+                    default:
+                        query = filterRequest.IsAscending ? query.OrderBy(t => t.CreatedAt) : query.OrderByDescending(t => t.CreatedAt);
+                        break;
+                }
+            }
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((filterRequest.Page - 1) * filterRequest.PageSize)
+                .Take(filterRequest.PageSize)
+                .ToListAsync();
+            var tripRequestModels = _mapper.Map<List<TripRequestModel>>(items);
+
+            return new PaginatedList<TripRequestModel>(tripRequestModels, totalCount, filterRequest.Page, filterRequest.PageSize);
         }
     }
 }

@@ -35,6 +35,14 @@ namespace F_Driver.Service.Mapper
             CreateMap<PriceTableModel, PriceTable>().ReverseMap();
 
             CreateMap<TripRequestModel, TripRequest>().ReverseMap();
+
+            CreateMap<TripMatchModel, TripMatch>().ReverseMap()
+                .ForMember(dest => dest.Driver, opt => opt.MapFrom(src => src.Driver))
+                .ForMember(dest => dest.TripRequest, opt => opt.MapFrom(src => src.TripRequest))
+                .ForMember(dest => dest.Cancellations, opt => opt.MapFrom(src => src.Cancellations))
+                .ForMember(dest => dest.Feedbacks, opt => opt.MapFrom(src => src.Feedbacks))
+                .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => src.Messages))
+                .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments));
         }
     }
 }
