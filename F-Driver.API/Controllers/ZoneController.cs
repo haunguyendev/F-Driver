@@ -72,6 +72,7 @@ namespace F_Driver.API.Controllers
             return Ok(ApiResult<ZoneResponse>.Succeed(new ZoneResponse { Zone = zone }));
         }
 
+        [HttpGet("filter")]
         //Get list zone by from zone id or to zone id
         public async Task<IActionResult> GetListZoneByFromZoneIdOrToZoneId(int? fromZoneId, int? toZoneId)
         {
