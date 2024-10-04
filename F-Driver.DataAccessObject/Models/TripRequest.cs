@@ -38,11 +38,8 @@ public partial class TripRequest : EntityBase
     [InverseProperty("TripRequestToZones")]
     public virtual Zone ToZone { get; set; } = null!;
 
-    [InverseProperty("DriverRequest")]
-    public virtual ICollection<TripMatch> TripMatchDriverRequests { get; set; } = new List<TripMatch>();
-
-    [InverseProperty("PassengerRequest")]
-    public virtual ICollection<TripMatch> TripMatchPassengerRequests { get; set; } = new List<TripMatch>();
+    [InverseProperty("TripRequest")]
+    public virtual ICollection<TripMatch> TripMatches { get; set; } = new List<TripMatch>();
 
     [ForeignKey("UserId")]
     [InverseProperty("TripRequests")]

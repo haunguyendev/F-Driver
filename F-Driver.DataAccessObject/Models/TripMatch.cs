@@ -8,11 +8,11 @@ namespace F_Driver.DataAccessObject.Models;
 
 public partial class TripMatch : EntityBase
 {
-   
 
-    public int? DriverRequestId { get; set; }
+    public int? TripRequestId { get; set; }  // Chuyến đi liên quan đến ghép cặp này
 
-    public int? PassengerRequestId { get; set; }
+    public int? DriverId { get; set; }       // Tài xế nào đang ghép cặp
+
 
     [Column(TypeName = "datetime")]
     public DateTime? MatchedAt { get; set; }
@@ -24,9 +24,6 @@ public partial class TripMatch : EntityBase
     [InverseProperty("TripMatch")]
     public virtual ICollection<Cancellation> Cancellations { get; set; } = new List<Cancellation>();
 
-    [ForeignKey("DriverRequestId")]
-    [InverseProperty("TripMatchDriverRequests")]
-    public virtual TripRequest? DriverRequest { get; set; }
 
     [InverseProperty("Match")]
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
@@ -34,9 +31,13 @@ public partial class TripMatch : EntityBase
     [InverseProperty("Match")]
     public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
-    [ForeignKey("PassengerRequestId")]
-    [InverseProperty("TripMatchPassengerRequests")]
-    public virtual TripRequest? PassengerRequest { get; set; }
+    // Quan hệ với Passenger (User)
+    [ForeignKey("DriverId")]
+    [InverseProperty("TripMatchesAsDriver")]
+    public virtual User? Driver { get; set; }
+    [ForeignKey("TripRequestId")]
+    [InverseProperty("TripMatches")]
+    public virtual TripRequest? TripRequest { get; set; }
 
     [InverseProperty("Match")]
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
