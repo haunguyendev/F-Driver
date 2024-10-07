@@ -4,6 +4,6 @@ namespace F_Driver.API.Payloads.Response
 {
     public class CancellationResponse
     {
-        public CancellationModel? CancellationModel { get; set; };
+        public CancellationModel? CancellationModel { get; set; }
     }
 }
