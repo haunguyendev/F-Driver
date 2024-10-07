@@ -243,7 +243,80 @@ namespace F_Driver.API.Controllers
             }
 
         }
-            #endregion
+        #endregion
 
+        #region
+        [HttpPost("complete-trip")]
+        [SwaggerOperation(
+    Summary = "Complete trip",
+    Description = "Allows a driver to complete a trip by setting the trip match status to 'Completed', updating wallet balances and recording transactions."
+)]
+        [SwaggerResponse(200, "Trip completed successfully")]
+        [SwaggerResponse(400, "Invalid request")]
+        [SwaggerResponse(401, "Unauthorized")]
+        [SwaggerResponse(404, "Trip match not found")]
+        [SwaggerResponse(500, "An error occurred while completing the trip")]
+        public async Task<IActionResult> CompleteTrip([FromBody] CompleteTripRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage)
+                                              .ToList();
+                return BadRequest(ApiResult<Dictionary<string, string[]>>.Error(new Dictionary<string, string[]>
+        {
+            { "Errors", errors.ToArray() }
+        }));
+            }
+
+            if (!Request.Headers.TryGetValue("Authorization", out var token))
+            {
+                return Unauthorized(ApiResult<string>.Error("Authorization header is missing or invalid."));
+            }
+
+            token = token.ToString().Split()[1];
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return Unauthorized(ApiResult<string>.Error("Authorization header is missing or invalid."));
+            }
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var driverClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.NameId);
+
+                if (driverClaim == null)
+                {
+                    return Unauthorized(ApiResult<string>.Error("Unauthorized: No driver ID found in token."));
+                }
+
+                var driverId = int.Parse(driverClaim.Value);
+
+                // Gọi service để hoàn thành chuyến đi
+                await _tripMatchService.CompleteTripAsync(request.TripMatchId, driverId);
+
+                return Ok(ApiResult<string>.Succeed("Trip completed successfully."));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ApiResult<object>.Fail(ex));
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ApiResult<object>.Fail(ex));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ApiResult<object>.Fail(ex));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResult<object>.Fail(ex));
+            }
         }
+
+        #endregion
+
+    }
 }
