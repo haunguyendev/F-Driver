@@ -30,7 +30,7 @@ namespace F_Driver.Repository
 
         public ITransactionRepository Transactions { get; }
 
-        public ITripMatchRepository TripMatchs { get; }
+        public ITripMatchRepository TripMatches { get; }
 
         public ITripRequestRepository TripRequests { get; }
 
@@ -47,7 +47,7 @@ namespace F_Driver.Repository
             return _context;
         }
 
-        public UnitOfWork(FDriverContext context, ICancellationReasonRepository cancellationReasons, ICancellationRepository cancellations, IDriverRepository driver, IFeedbackRepository feedbacks, IMessageRepository messages, IPaymentRepository payments, IPriceTableRepository priceTables, ITransactionRepository transactions, ITripMatchRepository tripMatchs, ITripRequestRepository tripRequests, IUserRepository users, IVehicleRepository vehicles, IWalletRepository wallets, IZoneRepository zones)
+        public UnitOfWork(FDriverContext context, ICancellationReasonRepository cancellationReasons, ICancellationRepository cancellations, IDriverRepository driver, IFeedbackRepository feedbacks, IMessageRepository messages, IPaymentRepository payments, IPriceTableRepository priceTables, ITransactionRepository transactions, ITripMatchRepository tripMatches, ITripRequestRepository tripRequests, IUserRepository users, IVehicleRepository vehicles, IWalletRepository wallets, IZoneRepository zones)
         {
             _context = context;
             CancellationReasons = cancellationReasons;
@@ -58,7 +58,7 @@ namespace F_Driver.Repository
             Payments = payments;
             PriceTables = priceTables;
             Transactions = transactions;
-            TripMatchs = tripMatchs;
+            TripMatches = tripMatches;
             TripRequests = tripRequests;
             Users = users;
             Vehicles = vehicles;

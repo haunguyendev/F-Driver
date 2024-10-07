@@ -16,6 +16,8 @@ public partial class TripMatch : EntityBase
 
     [Column(TypeName = "datetime")]
     public DateTime? MatchedAt { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? StartedAt { get; set; }
 
     [StringLength(20)]
     [Unicode(false)]
