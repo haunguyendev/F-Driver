@@ -20,6 +20,8 @@ public partial class TripRequest : EntityBase
     public DateOnly TripDate { get; set; }
 
     public TimeOnly StartTime { get; set; }
+    [Column(TypeName = "decimal(10, 2)")]
+    public decimal Price { get; set; }
 
     public int? Slot { get; set; }
 
