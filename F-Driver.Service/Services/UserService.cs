@@ -67,6 +67,7 @@ namespace F_Driver.Service.Services
                 }
 
 
+
                 await _unitOfWork.Users.CreateAsync(user);
 
                 await _unitOfWork.CommitAsync();

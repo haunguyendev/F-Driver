@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using F_Driver.DataAccessObject.Models;
+using F_Driver.Helpers;
 using F_Driver.Service.BusinessModels;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,8 @@ namespace F_Driver.Service.Mapper
         {
             // Mapping for UserModel <-> User
             CreateMap<CreateUserModel, User>()
-                .ForMember(dest => dest.Driver, opt => opt.MapFrom(src => src.Driver)) // Ensure Driver is mapped correctly
+                .ForMember(dest => dest.Driver, opt => opt.MapFrom(src => src.Driver))
+                .ForMember(dest=>dest.PasswordHash,opt=>opt.MapFrom(src=> SecurityUtil.Hash(src.PasswordHash)))// Ensure Driver is mapped correctly
                 .ReverseMap()
                 .MaxDepth(1); // Limit recursion depth if needed
 
