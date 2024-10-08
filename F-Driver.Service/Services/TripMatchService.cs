@@ -178,7 +178,6 @@ namespace F_Driver.Service.Services
         #region
         public async Task<bool> CompleteTripAsync(int tripMatchId, int driverId)
         {
-            // Tìm TripMatch bằng tripMatchId
             var tripMatch = await _unitOfWork.TripMatches.FindAsync(tm => tm.Id == tripMatchId);
 
             if (tripMatch == null)
@@ -186,79 +185,41 @@ namespace F_Driver.Service.Services
                 throw new ArgumentException("Trip match not found.");
             }
 
-            // Kiểm tra quyền tài xế
             if (tripMatch.DriverId != driverId)
             {
                 throw new UnauthorizedAccessException("You do not have permission to complete this trip.");
             }
 
-            // Kiểm tra trạng thái hiện tại (chỉ có thể hoàn thành nếu đang InProgress)
             if (tripMatch.Status != TripMatchStatusEnum.InProgress)
             {
                 throw new InvalidOperationException("Trip match is not in a valid state to be completed.");
             }
 
-            // Cập nhật trạng thái của TripMatch thành Completed
+            // Cập nhật trạng thái TripMatch thành Completed
             tripMatch.Status = TripMatchStatusEnum.Completed;
-             var tripRequest = await _unitOfWork.TripRequests.FindAsync(tr => tr.Id == tripMatch.TripRequestId);
-           
+            var tripRequest = await _unitOfWork.TripRequests.FindAsync(tr => tr.Id == tripMatch.TripRequestId);
 
-            // Lấy thông tin Passenger và Driver
-            var passengerWallet = await _unitOfWork.Wallets.FindAsync(w => w.UserId == tripRequest.UserId);
-            var driverWallet = await _unitOfWork.Wallets.FindAsync(w => w.UserId == driverId);
-
-            if (passengerWallet == null || driverWallet == null)
+            // Tạo Payment cho chuyến đi
+            var payment = new Payment
             {
-                throw new InvalidOperationException("Wallet not found.");
-            }
-
-            // Tính tiền chuyến đi
-            decimal tripCost = tripRequest.Price;
-
-            // Kiểm tra số dư ví Passenger
-            if (passengerWallet.Balance < tripCost)
-            {
-                throw new InvalidOperationException("Insufficient balance in passenger's wallet.");
-            }
-
-            // Thực hiện trừ tiền từ ví của Passenger
-            passengerWallet.Balance -= tripCost;
-
-            // Thực hiện cộng tiền vào ví của Driver
-            driverWallet.Balance += tripCost;
-
-            // Cập nhật ví của cả Passenger và Driver
-            await _unitOfWork.Wallets.UpdateAsync(passengerWallet);
-            await _unitOfWork.Wallets.UpdateAsync(driverWallet);
-
-            // Lưu thông tin Transaction cho Passenger (trừ tiền)
-            var passengerTransaction = new Transaction
-            {
-                WalletId = passengerWallet.Id,
-                Amount = -tripCost, // Trừ tiền
-                Type = TransactionTypeEnum.TripPayment,
-                TransactionDate = DateTime.UtcNow
+                MatchId = tripMatch.Id,
+                PassengerId = tripRequest.UserId,
+                DriverId = driverId,
+                Amount = tripRequest.Price,
+                PaymentMethod = "Wallet", // Hoặc phương thức bạn muốn
+                Status = PaymentStatusEnum.Pending,
+                PaidAt = null // Chưa thanh toán
             };
-            await _unitOfWork.Transactions.CreateAsync(passengerTransaction);
 
-            // Lưu thông tin Transaction cho Driver (cộng tiền)
-            var driverTransaction = new Transaction
-            {
-                WalletId = driverWallet.Id,
-                Amount = tripCost, // Cộng tiền
-                Type = TransactionTypeEnum.TripEarnings,
-                TransactionDate = DateTime.UtcNow
-            };
-            await _unitOfWork.Transactions.CreateAsync(driverTransaction);
-
-            // Lưu thay đổi vào database
+            await _unitOfWork.Payments.CreateAsync(payment);
             await _unitOfWork.TripMatches.UpdateAsync(tripMatch);
             await _unitOfWork.CommitAsync();
 
             return true;
         }
 
-        
+
+
 
         #endregion
 
