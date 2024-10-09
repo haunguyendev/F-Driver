@@ -28,13 +28,11 @@ namespace F_Driver.Service.Services
                 throw new ArgumentException("Payment not found.");
             }
 
-            // Kiểm tra quyền của Driver
             if (payment.DriverId != driverId)
             {
                 throw new UnauthorizedAccessException("You do not have permission to confirm this payment.");
             }
 
-            // Kiểm tra trạng thái Payment
             if (payment.Status != PaymentStatusEnum.Pending)
             {
                 throw new InvalidOperationException("Payment is not in a valid state to be confirmed.");
