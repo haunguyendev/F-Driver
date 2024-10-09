@@ -4,6 +4,7 @@ using F_Driver.Repository.Interfaces;
 using F_Driver.Service.BuisnessModels.QueryParameters;
 using F_Driver.Service.BusinessModels;
 using F_Driver.Service.Helpers;
+using F_Driver.Service.Shared;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -136,5 +137,35 @@ namespace F_Driver.Service.Services
 
             return new PaginatedList<TripRequestModel>(tripRequestModels, totalCount, filterRequest.Page, filterRequest.PageSize);
         }
+
+        #region cancel trip request update status
+        public async Task<bool> CancelTripRequestAsync(int tripRequestId, int passengerId)
+        {
+            var tripRequest = await _unitOfWork.TripRequests.FindAsync(t => t.Id == tripRequestId);
+
+            // Kiểm tra xem TripRequest có tồn tại không
+            if (tripRequest == null)
+            {
+                throw new ArgumentException("Trip request not found.");
+            }
+
+            // Kiểm tra quyền của passenger
+            if (tripRequest.UserId != passengerId)
+            {
+                throw new UnauthorizedAccessException("You do not have permission to cancel this trip request.");
+            }
+
+            // Cập nhật trạng thái thành Canceled
+            tripRequest.Status = TripRequestStatusEnum.Canceled;
+
+            await _unitOfWork.TripRequests.UpdateAsync(tripRequest);
+            await _unitOfWork.CommitAsync();
+
+            return true;
+        }
+
+
+        #endregion
+
     }
 }

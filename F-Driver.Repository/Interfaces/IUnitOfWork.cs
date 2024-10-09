@@ -20,7 +20,7 @@ namespace F_Driver.Repository.Interfaces
         IPaymentRepository Payments { get; }
         IPriceTableRepository PriceTables { get; }
         ITransactionRepository Transactions { get; }
-        ITripMatchRepository TripMatchs { get; }
+        ITripMatchRepository TripMatches { get; }
         ITripRequestRepository TripRequests { get; }
         IUserRepository Users { get; }
         IVehicleRepository Vehicles { get; }

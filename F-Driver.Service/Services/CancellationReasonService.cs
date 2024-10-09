@@ -2,6 +2,10 @@
 using F_Driver.DataAccessObject.Models;
 using F_Driver.Repository.Interfaces;
 using F_Driver.Service.BusinessModels;
+﻿using F_Driver.DataAccessObject.Models;
+using F_Driver.Repository;
+using F_Driver.Repository.Interfaces;
+using F_Driver.Repository.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,54 +26,37 @@ namespace F_Driver.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<List<CancellationReasonModel>> GetCancellationReasons()
-        {
-            var cancellationReasons = await _unitOfWork.CancellationReasons.FindAll().ToListAsync();
-            return _mapper.Map<List<CancellationReasonModel>>(cancellationReasons);
-        }
-
         public async Task<CancellationReasonModel> GetCancellationReason(int id)
         {
             var cancellationReason = await _unitOfWork.CancellationReasons.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
             return _mapper.Map<CancellationReasonModel>(cancellationReason);
         }
-
-        public async Task<CancellationReasonModel> CreateCancellationReason(CancellationReasonModel cancellationReasonModel)
+        public async Task<List<CancellationReason>> GetAllCancellationReasonsAsync()
         {
-            var cancellationReason = _mapper.Map<CancellationReason>(cancellationReasonModel);
+            return await _unitOfWork.CancellationReasons.FindAll().ToListAsync();
+        }
+        public async Task CreateCancellationReasonAsync(CancellationReason cancellationReason)
+        {
             await _unitOfWork.CancellationReasons.CreateAsync(cancellationReason);
             await _unitOfWork.CommitAsync();
-            return _mapper.Map<CancellationReasonModel>(cancellationReason);
         }
-
-        public async Task<CancellationReasonModel?> UpdateCancellationReason(int id, CancellationReasonModel cancellationReasonModel)
+        public async Task UpdateCancellationReasonAsync(CancellationReason cancellationReason)
         {
-            var cancellationReason = await _unitOfWork.CancellationReasons.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
-            if (cancellationReason == null)
-            {
-                return null;
-            }
-
-            _mapper.Map(cancellationReasonModel, cancellationReason);
+            await _unitOfWork.CancellationReasons.UpdateAsync(cancellationReason);
             await _unitOfWork.CommitAsync();
-            return _mapper.Map<CancellationReasonModel>(cancellationReason);
         }
-
-        public async Task<bool> DeleteCancellationReason(int id)
+        public async Task<CancellationReason?> GetCancellationReasonByIdAsync(int id)
         {
-            var cancellationReason = await _unitOfWork.CancellationReasons.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
-            if (cancellationReason == null)
+            return await _unitOfWork.CancellationReasons.FindAsync(cr=>cr.Id==id);
+        }
+        public async Task DeleteCancellationReasonAsync(int id)
+        {
+            var cancellationReason = await _unitOfWork.CancellationReasons.FindAsync(cr => cr.Id == id);
+            if (cancellationReason != null)
             {
-                return false;
+                await _unitOfWork.CancellationReasons.DeleteAsync(cancellationReason);
+                await _unitOfWork.CommitAsync();
             }
-            var cancellation = await _unitOfWork.Cancellations.FindByCondition(x => x.ReasonId == id).FirstOrDefaultAsync();
-            if (cancellation != null)
-            {
-                return false;
-            }
-            await _unitOfWork.CancellationReasons.DeleteAsync(cancellationReason);
-            await _unitOfWork.CommitAsync();
-            return true;
         }
     }
 }
