@@ -1,3 +1,7 @@
+﻿using AutoMapper;
+using F_Driver.DataAccessObject.Models;
+using F_Driver.Repository.Interfaces;
+using F_Driver.Service.BusinessModels;
 ﻿using F_Driver.DataAccessObject.Models;
 using F_Driver.Repository;
 using F_Driver.Repository.Interfaces;
@@ -14,13 +18,19 @@ namespace F_Driver.Service.Services
     public class CancellationReasonService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public CancellationReasonService(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+
+        public CancellationReasonService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            
-
+            _mapper = mapper;
         }
 
+        public async Task<CancellationReasonModel> GetCancellationReason(int id)
+        {
+            var cancellationReason = await _unitOfWork.CancellationReasons.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+            return _mapper.Map<CancellationReasonModel>(cancellationReason);
+        }
         public async Task<List<CancellationReason>> GetAllCancellationReasonsAsync()
         {
             return await _unitOfWork.CancellationReasons.FindAll().ToListAsync();

@@ -131,6 +131,15 @@ namespace F_Driver.Service.Services
 
                 await _unitOfWork.Users.UpdateAsync(user);
 
+                //create wallet for user
+                var wallet = new Wallet
+                {
+                    UserId = user.Id,
+                    Balance = 0,
+                    CreatedAt = DateTime.Now
+                };
+                await _unitOfWork.Wallets.CreateAsync(wallet);
+
                 var rs = await _unitOfWork.CommitAsync();
                 if (rs > 0)
                 {

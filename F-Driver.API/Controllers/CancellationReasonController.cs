@@ -19,6 +19,18 @@ namespace F_Driver.API.Controllers
             _service = service;
 
         }
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetCancellationReason(int id)
+        {
+            var cancellationReason = await _service.GetCancellationReason(id);
+            if (cancellationReason == null)
+            {
+                var result = ApiResult<Dictionary<string, string[]>>.Fail(new Exception("Cancellation is not found."));
+                return NotFound(result);
+            }
+            return Ok(ApiResult<CancellationReasonResponse>.Succeed(new CancellationReasonResponse { ReasonId = cancellationReason.Id, Content = cancellationReason.Content }));
+        }
         [HttpGet("CancellationReasons")]
         [SwaggerOperation(
         Summary = "Get all cancellation reasons",
