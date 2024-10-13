@@ -21,11 +21,11 @@ public partial class User : EntityBase
 
     [StringLength(15)]
     [Unicode(false)]
-    public string PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
 
     [StringLength(255)]
     [Unicode(false)]
-    public string PasswordHash { get; set; } = null!;
+    public string? PasswordHash { get; set; } 
 
     [Column("ProfileImageURL")]
     [StringLength(255)]
