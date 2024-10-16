@@ -317,6 +317,79 @@ namespace F_Driver.API.Controllers
         }
 
         #endregion
+        #region api cancel trip match
+        [HttpPost("cancel-trip")]
+        [SwaggerOperation(
+    Summary = "Cancel trip",
+    Description = "Allows a passenger or driver to cancel a trip match by selecting a cancellation reason."
+)]
+        [SwaggerResponse(200, "Trip cancelled successfully")]
+        [SwaggerResponse(400, "Invalid request")]
+        [SwaggerResponse(401, "Unauthorized")]
+        [SwaggerResponse(404, "Trip match not found")]
+        [SwaggerResponse(500, "An error occurred while cancelling the trip")]
+        public async Task<IActionResult> CancelTrip([FromBody] CancelTripRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage)
+                                              .ToList();
+                return BadRequest(ApiResult<Dictionary<string, string[]>>.Error(new Dictionary<string, string[]>
+        {
+            { "Errors", errors.ToArray() }
+        }));
+            }
+
+            // Kiểm tra Authorization header
+            if (!Request.Headers.TryGetValue("Authorization", out var token))
+            {
+                return Unauthorized(ApiResult<string>.Error("Authorization header is missing or invalid."));
+            }
+
+            token = token.ToString().Split()[1];
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return Unauthorized(ApiResult<string>.Error("Authorization header is missing or invalid."));
+            }
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.NameId);
+
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(ApiResult<string>.Error("Unauthorized: No user ID found in token."));
+                }
+
+                var userId = int.Parse(userIdClaim.Value);
+
+                // Gọi service để hủy chuyến đi
+                await _tripMatchService.CancelTripMatchAsync(request.TripMatchId, userId, request.ReasonId);
+
+                return Ok(ApiResult<string>.Succeed("Trip cancelled successfully."));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ApiResult<object>.Fail(ex));
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ApiResult<object>.Fail(ex));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ApiResult<object>.Fail(ex));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResult<object>.Fail(ex));
+            }
+        }
+
+        #endregion
 
     }
 }

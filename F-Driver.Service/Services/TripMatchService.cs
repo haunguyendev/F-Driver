@@ -220,8 +220,40 @@ namespace F_Driver.Service.Services
 
 
 
-
         #endregion
+        #region cancel trip match
+
+        public async Task CancelTripMatchAsync(int tripMatchId, int reasonId, int userId)
+        {
+            // Kiểm tra TripMatch có tồn tại không
+            var tripMatch = await _unitOfWork.TripMatches.FindAsync(tm=>tm.Id==tripMatchId);
+            
+            if (tripMatch == null)
+                throw new KeyNotFoundException("TripMatch not found");
+            var tripRequest = await _unitOfWork.TripRequests.FindAsync(tr => tr.Id == tripMatch.TripRequestId);
+
+            // Kiểm tra quyền của passenger hoặc driver (so khớp với userId)
+            if (tripRequest.UserId != userId && tripMatch.DriverId != userId)
+                throw new UnauthorizedAccessException("User is not authorized to cancel this trip match.");
+
+            // Cập nhật trạng thái của TripMatch thành "Canceled"
+            tripMatch.Status = "Canceled";
+            await _unitOfWork.TripMatches.UpdateAsync(tripMatch);
+
+            // Lưu lý do hủy
+            var cancellation = new Cancellation
+            {
+                TripMatchId = tripMatchId,
+                ReasonId = reasonId,
+                CanceledAt = DateTime.UtcNow
+            };
+            await _unitOfWork.Cancellations.CreateAsync(cancellation);
+
+            // Lưu thay đổi vào database
+            await _unitOfWork.CommitAsync   ();
+        }
+        #endregion
+
 
 
     }
