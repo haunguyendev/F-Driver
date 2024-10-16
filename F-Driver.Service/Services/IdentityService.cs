@@ -2,6 +2,7 @@
 using F_Driver.DataAccessObject.Models;
 using F_Driver.Helpers;
 using F_Driver.Repository.Interfaces;
+using F_Driver.Repository.Repositories;
 using F_Driver.Service.BusinessModels;
 using F_Driver.Service.Settings;
 using F_Driver.Service.Shared;
@@ -11,6 +12,7 @@ using Google.Apis.Oauth2.v2;
 using Google.Apis.Oauth2.v2.Data;
 using Google.Apis.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Pkix;
 using System;
@@ -29,12 +31,14 @@ namespace F_Driver.Service.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public IdentityService( IMapper mapper, IUnitOfWork unitOfWork, JwtSettings jwtSettings)
+        public IdentityService( IMapper mapper, IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettingsOptions)
         {
-            _jwtSettings = jwtSettings;
+            _jwtSettings = jwtSettingsOptions.Value;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
+
+       
         #region login for driver
         public LoginResult LoginDriver(string email, string password)
         {
@@ -66,8 +70,8 @@ namespace F_Driver.Service.Services
             }
 
             // Kiểm tra mật khẩu
-            var hash = SecurityUtil.Hash(password);
-            if (!user.PasswordHash.Equals(hash))
+            //var hash = SecurityUtil.Hash(password);
+            if (!user.PasswordHash.Equals(password))
             {
                 return new LoginResult
                 {

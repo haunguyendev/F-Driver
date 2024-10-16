@@ -47,6 +47,8 @@ namespace F_Driver.API.Extensions
             {
                 Key = secretKey
             };
+            services.Configure<JwtSettings>(options => { options.Key=jwtSettings.Key; });
+
             var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
             var clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET");
             if (string.IsNullOrEmpty(clientId))
@@ -97,7 +99,7 @@ namespace F_Driver.API.Extensions
             services.ConfigureDbContext(configuration);
             // Configure Redis connection
             // Add StackExchangeRedisCache as the IDistributedCache implementation
-            services.AddInfrastructureServices();
+            
             // Add Mapper Services to Container injection
             services.AddAutoMapper(typeof(ApplicationMapper));
 
@@ -158,8 +160,7 @@ namespace F_Driver.API.Extensions
             services.AddCors(option =>
                 option.AddPolicy("CORS", builder =>
                     builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()));
-
-
+            services.AddInfrastructureServices();
 
             return services;
         }

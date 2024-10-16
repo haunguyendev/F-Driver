@@ -34,5 +34,6 @@ namespace F_Driver.Service.BusinessModels
         public string? VerificationStatus { get; set; }
 
         public DateTime? CreatedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
     }
 }

@@ -8,5 +8,6 @@ namespace F_Driver.Service.Services
 {
     public class WalletService
     {
+
     }
 }

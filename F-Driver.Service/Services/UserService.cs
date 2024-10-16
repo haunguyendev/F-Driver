@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
@@ -374,6 +375,41 @@ namespace F_Driver.Service.Services
                 Console.WriteLine(ex.InnerException?.Message);
                 throw;
             }
+        }
+        #endregion
+        #region get user detail
+        public async Task<PassengerDetailModel> GetPassengerDetailById(int id)
+        {
+
+            var user = await _unitOfWork.Users.GetPassengerById(id);
+            if (user == null)
+            {
+                throw new EntryPointNotFoundException("Passenger not found.");
+            }
+            var walletDetail=_mapper.Map<WalletModel>(user.Wallet);
+            var passengerDetail = _mapper.Map<PassengerDetailModel>(user);
+            passengerDetail.Wallet = walletDetail;
+
+            return passengerDetail;
+        }
+
+        public async Task<DriverDetailModel> GetDriverDetailById(int id)
+        {
+            var user = await _unitOfWork.Users.GetDriverById(id);
+            if (user == null)
+            {
+                throw new EntryPointNotFoundException("Driver not found.");
+            }
+
+            // Map user to DriverDetailModel
+            var driverDetail = _mapper.Map<DriverDetailModel>(user);
+            var driverInfo = _mapper.Map<DriverModel>(user.Driver);
+            var vehicles= user.Driver.Vehicles.Select(x=>_mapper.Map<VehicleModel>(x)).ToList();    
+            driverInfo.Vehicles = vehicles;
+            driverDetail.DriverInfo = driverInfo;
+            return driverDetail;
+
+            
         }
         #endregion
     }

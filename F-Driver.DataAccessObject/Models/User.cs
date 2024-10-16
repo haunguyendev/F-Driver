@@ -52,6 +52,8 @@ public partial class User : EntityBase
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? ModifiedAt { get; set; }
 
     [InverseProperty("User")]
     public virtual Driver? Driver { get; set; }
