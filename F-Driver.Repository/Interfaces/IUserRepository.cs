@@ -9,5 +9,7 @@ namespace F_Driver.Repository.Interfaces
 {
     public interface IUserRepository : IRepositoryBaseAsync<User>
     {
+        Task<User> GetPassengerById(int id);
+        Task<User> GetDriverById(int id);
     }
 }

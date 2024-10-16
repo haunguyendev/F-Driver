@@ -47,6 +47,8 @@ namespace F_Driver.API.Extensions
             {
                 Key = secretKey
             };
+            services.Configure<JwtSettings>(options => { options.Key=jwtSettings.Key; });
+
             var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
             var clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET");
             if (string.IsNullOrEmpty(clientId))
@@ -97,9 +99,36 @@ namespace F_Driver.API.Extensions
             services.ConfigureDbContext(configuration);
             // Configure Redis connection
             // Add StackExchangeRedisCache as the IDistributedCache implementation
-            services.AddInfrastructureServices();
+            
             // Add Mapper Services to Container injection
             services.AddAutoMapper(typeof(ApplicationMapper));
+
+            services.AddAuthorization();
+
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true
+                    };
+                }).AddCookie()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = clientId;
+                    options.ClientSecret = clientSecret;
+                    
+                });
 
             services.AddSwaggerGen(option =>
             {
@@ -131,8 +160,7 @@ namespace F_Driver.API.Extensions
             services.AddCors(option =>
                 option.AddPolicy("CORS", builder =>
                     builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()));
-
-
+            services.AddInfrastructureServices();
 
             return services;
         }
@@ -175,6 +203,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<FirebaseService>()
                 .AddScoped<EmailService>()
                 .AddScoped<TripRequestService>()
+                .AddScoped<CancellationReasonService>()
            //Add repository
                 .AddScoped<ICancellationReasonRepository,CancellationReasonRepository>()
                 .AddScoped<ICancellationRepository, CancellationRepository>()

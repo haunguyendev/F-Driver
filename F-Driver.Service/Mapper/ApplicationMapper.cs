@@ -45,6 +45,15 @@ namespace F_Driver.Service.Mapper
                 .ForMember(dest => dest.Feedbacks, opt => opt.MapFrom(src => src.Feedbacks))
                 .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => src.Messages))
                 .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments));
+
+            CreateMap<CancellationReason,CancellationReasonModel>().ReverseMap();
+            CreateMap<Cancellation,CancellationModel>().ReverseMap();
+
+            CreateMap<User, PassengerDetailModel>().ReverseMap();
+            CreateMap<User, DriverDetailModel>().ReverseMap();
+            CreateMap<Wallet, WalletModel>().ReverseMap();
+            CreateMap<Driver,DriverModel>().ReverseMap();
+            CreateMap<Vehicle,VehicleModel>().ReverseMap(); 
         }
     }
 }

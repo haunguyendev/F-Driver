@@ -2,15 +2,19 @@
 using F_Driver.DataAccessObject.Models;
 using F_Driver.Helpers;
 using F_Driver.Repository.Interfaces;
+using F_Driver.Repository.Repositories;
 using F_Driver.Service.BusinessModels;
 using F_Driver.Service.Settings;
 using F_Driver.Service.Shared;
+using Google.Apis.Auth;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Oauth2.v2;
 using Google.Apis.Oauth2.v2.Data;
 using Google.Apis.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Pkix;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,12 +31,14 @@ namespace F_Driver.Service.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public IdentityService( IMapper mapper, IUnitOfWork unitOfWork, JwtSettings jwtSettings)
+        public IdentityService( IMapper mapper, IUnitOfWork unitOfWork, IOptions<JwtSettings> jwtSettingsOptions)
         {
-            _jwtSettings = jwtSettings;
+            _jwtSettings = jwtSettingsOptions.Value;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
+
+       
         #region login for driver
         public LoginResult LoginDriver(string email, string password)
         {
@@ -64,8 +70,8 @@ namespace F_Driver.Service.Services
             }
 
             // Kiểm tra mật khẩu
-            var hash = SecurityUtil.Hash(password);
-            if (!user.PasswordHash.Equals(hash))
+            //var hash = SecurityUtil.Hash(password);
+            if (!user.PasswordHash.Equals(password))
             {
                 return new LoginResult
                 {
@@ -93,17 +99,18 @@ namespace F_Driver.Service.Services
             try
             {
                 var credential = GoogleCredential.FromAccessToken(token);
+
                 var oauth2Service = new Oauth2Service(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
-                    ApplicationName = "F-Driver",
+                    ApplicationName = "project-289984090391",
                 });
 
                 // Lấy thông tin người dùng từ Google
                 Userinfo userInfo = await oauth2Service.Userinfo.Get().ExecuteAsync();
 
                 // Kiểm tra xem người dùng với role là 'passenger' đã tồn tại chưa
-                var user = await _unitOfWork.Users.FindByCondition(u => u.Email == userInfo.Email && u.Role ==UserRoleEnum.PASSENGER).FirstOrDefaultAsync();
+                var user = await _unitOfWork.Users.FindByCondition(u => u.Email == userInfo.Email && u.Role == UserRoleEnum.PASSENGER).FirstOrDefaultAsync();
 
                 // Nếu không tìm thấy, tạo người dùng mới
                 if (user == null)
@@ -113,18 +120,43 @@ namespace F_Driver.Service.Services
                         Name = userInfo.Name,
                         Email = userInfo.Email,
                         ProfileImageUrl = userInfo.Picture,
-                        Role = "Passenger", 
+                        Role = UserRoleEnum.PASSENGER,
                         Verified = false,
+                        IsMailValid = true,
                         VerificationStatus = "Pending",
                         CreatedAt = DateTime.Now
                     };
 
-                    
+                    // Tạo ví mới với số dư là 0
+                    var wallet = new Wallet
+                    {
+                        User = user,
+                        Balance = 0, // Khởi tạo số dư là 0
+                        CreatedAt = DateTime.Now
+                    };
+
+                    // Lưu người dùng và ví vào cơ sở dữ liệu
                     await _unitOfWork.Users.CreateAsync(user);
+                    await _unitOfWork.Wallets.CreateAsync(wallet); // Thêm dòng này để lưu ví
                     await _unitOfWork.CommitAsync();
                 }
+                else
+                {
+                    // Nếu đã tồn tại, kiểm tra ví có tồn tại không
+                    if (user.Wallet == null)
+                    {
+                        // Nếu không có ví, tạo ví mới với số dư là 0
+                        var wallet = new Wallet
+                        {
+                            User = user,
+                            Balance = 0, // Khởi tạo số dư là 0
+                            CreatedAt = DateTime.Now
+                        };
 
-                
+                        await _unitOfWork.Wallets.CreateAsync(wallet);
+                        await _unitOfWork.CommitAsync();
+                    }
+                }
 
                 // Tạo JWT Token và Refresh Token cho người dùng
                 var tokenResponse = CreateJwtToken(user);
@@ -135,8 +167,7 @@ namespace F_Driver.Service.Services
                     Authenticated = true,
                     Token = tokenResponse,
                     RefreshToken = tokenRefreshResponse,
-                    Message="Login Successfully!"
-                    
+                    Message = "Login Successfully!"
                 };
             }
             catch (Exception ex)
@@ -146,11 +177,11 @@ namespace F_Driver.Service.Services
                     Authenticated = false,
                     Token = null,
                     RefreshToken = null,
-                    Message="Login failed!"
-                    
+                    Message = "Login failed!"
                 };
             }
         }
+
 
         #endregion
 

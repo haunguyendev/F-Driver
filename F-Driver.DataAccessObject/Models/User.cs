@@ -21,11 +21,11 @@ public partial class User : EntityBase
 
     [StringLength(15)]
     [Unicode(false)]
-    public string PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
 
     [StringLength(255)]
     [Unicode(false)]
-    public string PasswordHash { get; set; } = null!;
+    public string? PasswordHash { get; set; } 
 
     [Column("ProfileImageURL")]
     [StringLength(255)]
@@ -52,6 +52,8 @@ public partial class User : EntityBase
 
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? ModifiedAt { get; set; }
 
     [InverseProperty("User")]
     public virtual Driver? Driver { get; set; }
