@@ -22,6 +22,9 @@ namespace F_Driver.Service.BusinessModels
         public bool? Verified { get; set; }
         public string? VerificationStatus { get; set; }
         public bool? IsMailValid { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
         public WalletModel Wallet { get; set; }
+
     }
     }
