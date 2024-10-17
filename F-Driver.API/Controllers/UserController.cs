@@ -158,7 +158,10 @@ namespace F_Driver.API.Controllers
                 var errorDetails = await _userService.HandleStatusVerifyCodes(request.ErrorCodes, request.UserId);
 
                 // Return the response with user ID and error details
-                return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails }));
+    
+
+                return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails.Result}));
+
             }
             catch (InvalidOperationException ex)
             {
