@@ -295,7 +295,49 @@ namespace F_Driver.API.Controllers
         }
 
         #endregion
+        #region api update verified status
+        [Authorize(Roles = "Admin")]
+        [HttpPut("users/{id}/status")]
+        [SwaggerOperation(
+    Summary = "Update passenger verification status",
+    Description = "Admin updates the verification status of a passenger (Approve or Reject)."
+)]
+        [SwaggerResponse(StatusCodes.Status200OK, "User status updated successfully", typeof(ApiResult<object>))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User not found", typeof(ApiResult<object>))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request", typeof(ApiResult<object>))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "An error occurred while updating the user status", typeof(ApiResult<object>))]
+        public async Task<IActionResult> UpdatePassengerVerificationStatus(int id, [FromBody] UpdateVerificationStatusRequest request)
+        {
+            try
+            {
+                // Gọi service để cập nhật trạng thái
+                await _userService.UpdateVerificationStatusAsync(id, request.VerificationStatus);
 
+                return Ok(ApiResult<object>.Succeed("User verification status updated successfully"));
+            }
+            catch (Exception ex)
+            {
+                // Xử lý exception và trả về lỗi tương ứng
+                if (ex.Message == "User not found")
+                {
+                    return NotFound(ApiResult<string>.Error("User not found"));
+                }
+                else if (ex.Message == "User verification status is not pending.")
+                {
+                    return BadRequest(ApiResult<string>.Error("User verification status is not pending."));
+                }
+                else if (ex.Message == "Invalid verification status.")
+                {
+                    return BadRequest(ApiResult<string>.Error("Invalid verification status."));
+                }
+                else
+                {
+                    return StatusCode(500, ApiResult<object>.Fail(ex));  // Trả về lỗi 500 cho các lỗi khác
+                }
+            }
+        }
+
+        #endregion
 
     }
 }

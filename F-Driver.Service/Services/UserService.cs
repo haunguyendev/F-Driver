@@ -6,6 +6,7 @@ using F_Driver.Repository.Repositories;
 using F_Driver.Service.BusinessModels;
 using F_Driver.Service.BusinessModels.QueryParameters;
 using F_Driver.Service.Helpers;
+using F_Driver.Service.Shared;
 using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -410,6 +411,45 @@ namespace F_Driver.Service.Services
             return driverDetail;
 
             
+        }
+        #endregion
+        #region update verified status
+        public async Task<bool> UpdateVerificationStatusAsync(int userId, string verificationStatus)
+        {
+            // Lấy thông tin user từ repository
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found");  // Ném exception nếu không tìm thấy user
+            }
+
+            // Kiểm tra trạng thái hiện tại của user
+            if (user.VerificationStatus != UserVerificationStatusEnum.PENDING)
+            {
+                throw new Exception("User verification status is not pending.");  // Ném exception nếu trạng thái không phải là "Pending"
+            }
+
+            // Cập nhật trạng thái xác thực dựa trên yêu cầu
+            if (verificationStatus == UserVerificationStatusEnum.APPROVED)
+            {
+                user.Verified = true;
+                user.VerificationStatus = UserVerificationStatusEnum.APPROVED;
+            }
+            else if (verificationStatus == UserVerificationStatusEnum.REJECT)
+            {
+                user.Verified = false;
+                user.VerificationStatus = UserVerificationStatusEnum.REJECT;
+            }
+            else
+            {
+                throw new Exception("Invalid verification status.");  // Ném exception nếu trạng thái không hợp lệ
+            }
+
+            // Cập nhật thông tin vào database
+            await _unitOfWork.Users.UpdateAsync(user);
+            await _unitOfWork.CommitAsync();
+
+            return true;  // Trả về true nếu update thành công
         }
         #endregion
     }
