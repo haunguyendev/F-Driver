@@ -123,7 +123,7 @@ namespace F_Driver.Service.Services
                         Role = UserRoleEnum.PASSENGER,
                         Verified = false,
                         IsMailValid = true,
-                        VerificationStatus = "Pending",
+                        VerificationStatus = UserVerificationStatusEnum.INIT,
                         CreatedAt = DateTime.Now
                     };
 
@@ -140,23 +140,7 @@ namespace F_Driver.Service.Services
                     await _unitOfWork.Wallets.CreateAsync(wallet); // Thêm dòng này để lưu ví
                     await _unitOfWork.CommitAsync();
                 }
-                else
-                {
-                    // Nếu đã tồn tại, kiểm tra ví có tồn tại không
-                    if (user.Wallet == null)
-                    {
-                        // Nếu không có ví, tạo ví mới với số dư là 0
-                        var wallet = new Wallet
-                        {
-                            User = user,
-                            Balance = 0, // Khởi tạo số dư là 0
-                            CreatedAt = DateTime.Now
-                        };
-
-                        await _unitOfWork.Wallets.CreateAsync(wallet);
-                        await _unitOfWork.CommitAsync();
-                    }
-                }
+                
 
                 // Tạo JWT Token và Refresh Token cho người dùng
                 var tokenResponse = CreateJwtToken(user);
