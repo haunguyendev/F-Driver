@@ -5,9 +5,12 @@ using F_Driver.Helpers;
 using F_Driver.Service.BusinessModels;
 using F_Driver.Service.BusinessModels.QueryParameters;
 using F_Driver.Service.Services;
+using F_Driver.Service.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Text.RegularExpressions;
 
 namespace F_Driver.API.Controllers
@@ -232,6 +235,63 @@ namespace F_Driver.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        #region api get user detail
+        //[Authorize(Roles = "Admin")]
+        [HttpGet("{id}")]
+        [SwaggerOperation(
+    Summary = "Get user detail by ID (Admin only)",
+    Description = "Fetches the user details (Passenger or Driver) by ID for admins."
+)]
+        [SwaggerResponse(StatusCodes.Status200OK, "User detail retrieved successfully", typeof(ApiResult<object>))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User not found", typeof(ApiResult<object>))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "An error occurred while retrieving the user details", typeof(ApiResult<object>))]
+        public async Task<IActionResult> GetUserDetailById(int id)
+        {
+            try
+            {
+                var user = await _userService.GetUserById(id);
+
+                if (user == null)
+                {
+                    return NotFound(ApiResult<string>.Error("User not found"));
+                }
+
+                // Lấy vai trò của user
+                var userRole = user.Role;
+
+                if (userRole == UserRoleEnum.PASSENGER)
+                {
+                    var passenger = await _userService.GetPassengerDetailById(id);
+                    if (passenger == null)
+                    {
+                        return NotFound(ApiResult<string>.Error("Passenger not found"));
+                    }
+
+                    return Ok(ApiResult<object>.Succeed(passenger));
+                }
+                else if (userRole == UserRoleEnum.DRIVER)
+                {
+                    var driver = await _userService.GetDriverDetailById(id);
+                    if (driver == null)
+                    {
+                        return NotFound(ApiResult<string>.Error("Driver not found"));
+                    }
+
+                    return Ok(ApiResult<object>.Succeed(driver));
+                }
+                else
+                {
+                    return BadRequest(ApiResult<string>.Error("Unsupported role"));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResult<object>.Fail(ex));
+            }
+        }
+
+        #endregion
 
 
     }
