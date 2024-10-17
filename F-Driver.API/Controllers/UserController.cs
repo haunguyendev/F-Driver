@@ -68,12 +68,12 @@ namespace F_Driver.API.Controllers
                 {
                     return BadRequest(new { message = "Driver must be verified by admin" });
                 }
-                if (userRequest.Driver.Vehicles == null || !userRequest.Driver.Vehicles.Any(v => v.IsVerified))
+                if (userRequest.Vehicle == null)
                 {
                     return BadRequest(new { message = "Driver must have at least one vehicle" });
                 }
 
-                if (userRequest.Driver.Vehicles.Any(v => v.IsVerified))
+                if (userRequest.Vehicle.IsVerified)
                 {
                     return BadRequest(new { message = "Vehicles must be approved by admin before use." });
                 }
@@ -160,7 +160,7 @@ namespace F_Driver.API.Controllers
                 // Return the response with user ID and error details
     
 
-                return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails.Result}));
+                return Ok(ApiResult<StatusUserResponse>.Succeed(new StatusUserResponse { Message = errorDetails}));
 
             }
             catch (InvalidOperationException ex)
