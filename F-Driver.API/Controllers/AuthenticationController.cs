@@ -13,7 +13,7 @@ using System.Security.Claims;
 
 namespace F_Driver.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace F_Driver.API.Controllers
         }
         #region api login for driver
         [AllowAnonymous]
-        [HttpPost("login-driver")]
+        [HttpPost("drivers/login")]
         public async Task<IActionResult> LoginDriver([FromBody] LoginRequest request)
         {
             try
@@ -63,7 +63,7 @@ namespace F_Driver.API.Controllers
         #endregion
 
         [AllowAnonymous]
-        [HttpPost("google-login-passenger")]
+        [HttpPost("passengers/google/login")]
         public async Task<IActionResult> GoogleLoginPassenger([FromBody] LoginGoogleRequest request)
         {
             try
@@ -98,7 +98,7 @@ namespace F_Driver.API.Controllers
         }
         #region api get information
         [Authorize]
-        [HttpGet("profile")]
+        [HttpGet("users/profile")]
         [SwaggerOperation(
     Summary = "Get user profile",
     Description = "Returns user profile details based on the user's role (Passenger or Driver)."

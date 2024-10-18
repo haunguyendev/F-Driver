@@ -4,5 +4,6 @@
     {
         public int TripMatchId { get; set; }
         public string Status { get; set; }
+        public bool IsTripMatchUpdate { get; set; }
     }
 }

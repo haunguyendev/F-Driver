@@ -151,7 +151,7 @@ namespace F_Driver.API.Controllers
         }
         #endregion
         #region api delete
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("CancellationReasons/{id}")]
         [SwaggerOperation(
       Summary = "Delete cancellation reason",
       Description = "Deletes an existing cancellation reason by its ID."
