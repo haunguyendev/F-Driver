@@ -86,7 +86,6 @@ namespace F_Driver.Service.Services
         #region
         public async Task<bool> CreateTripMatchAsync(int tripRequestId,int driverId)
         {
-            // Kiểm tra sự tồn tại của TripRequest và Driver
             var tripRequest = await _unitOfWork.TripRequests.FindAsync(t=>t.Id==tripRequestId);
             var driver = await _unitOfWork.Users.FindAsync(d=>d.Id==driverId);
 
@@ -95,7 +94,6 @@ namespace F_Driver.Service.Services
                 return false;
             }
 
-            // Tạo TripMatch với trạng thái Pending
             var tripMatch = new TripMatch
             {
                 TripRequestId =tripRequestId,
@@ -111,9 +109,10 @@ namespace F_Driver.Service.Services
         }
 
         #endregion
-        #region update trip match status
+        #region update trip match status by passenger
         public async Task UpdateTripMatchStatusAsync(int tripMatchId, int passengerId, string status)
         {
+
             // Kiểm tra sự tồn tại của TripMatch
             var tripMatch = await _unitOfWork.TripMatches.FindAsync(tm => tm.Id == tripMatchId);
             if (tripMatch == null)
@@ -123,7 +122,12 @@ namespace F_Driver.Service.Services
 
             // Kiểm tra sự tồn tại của TripRequest
             var tripRequest = await _unitOfWork.TripRequests.FindAsync(tr => tr.Id == tripMatch.TripRequestId);
-            if (tripRequest == null || tripRequest.UserId != passengerId)
+            var user = await _unitOfWork.Users.FindAsync(u => u.Id == passengerId);
+            if(user == null)
+            {
+                throw new EntryPointNotFoundException("User not found.");
+            }
+            if (tripRequest == null || tripRequest.UserId != passengerId|| user.Role!=UserRoleEnum.PASSENGER)
             {
                 throw new Exception("Unauthorized or trip request not found.");
             }
@@ -133,6 +137,10 @@ namespace F_Driver.Service.Services
             {
                 tripMatch.Status = TripMatchStatusEnum.Accepted;
                 tripRequest.Status = TripRequestStatusEnum.Completed; // Đánh dấu request là đã hoàn thành
+                var listTripMatchs = _unitOfWork.TripMatches.FindByCondition(x => x.TripRequestId == tripMatch.TripRequestId).ToList();
+                listTripMatchs.Remove(tripMatch);
+                listTripMatchs.ForEach(x=>x.Status = TripMatchStatusEnum.Rejected);
+                await _unitOfWork.TripMatches.UpdateListAsync(listTripMatchs);
             }
             else if (status == TripMatchStatusEnum.Rejected)
             {
@@ -195,7 +203,6 @@ namespace F_Driver.Service.Services
                 throw new InvalidOperationException("Trip match is not in a valid state to be completed.");
             }
 
-            // Cập nhật trạng thái TripMatch thành Completed
             tripMatch.Status = TripMatchStatusEnum.Completed;
             var tripRequest = await _unitOfWork.TripRequests.FindAsync(tr => tr.Id == tripMatch.TripRequestId);
 
@@ -249,8 +256,8 @@ namespace F_Driver.Service.Services
             };
             await _unitOfWork.Cancellations.CreateAsync(cancellation);
 
-            // Lưu thay đổi vào database
-            await _unitOfWork.CommitAsync   ();
+            
+            await _unitOfWork.CommitAsync();
         }
         #endregion
 

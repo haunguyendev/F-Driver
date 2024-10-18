@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace F_Driver.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/payments")]
     [ApiController]
     public class PaymentController : ControllerBase
     {

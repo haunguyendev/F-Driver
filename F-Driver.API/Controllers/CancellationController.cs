@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace F_Driver.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/cancellations")]
     [ApiController]
     public class CancellationController : ControllerBase
     {
