@@ -1,4 +1,6 @@
-﻿using F_Driver.Service.BusinessModels;
+﻿using F_Driver.Helpers;
+using F_Driver.Service.BusinessModels;
+using F_Driver.Service.Shared;
 using System.ComponentModel.DataAnnotations;
 
 namespace F_Driver.API.Payloads.Request
@@ -12,22 +14,14 @@ namespace F_Driver.API.Payloads.Request
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        public bool IsMailValid { get; set; } = false;
-        [Required]
         [RegularExpression(@"^0\d{9}$", ErrorMessage = "Phone number must start with 0 and be exactly 10 digits long.")]
         public string PhoneNumber { get; set; } = string.Empty;
         [Required]
-        public string PasswordHash { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
         [Required]
         public IFormFile? ProfileImageUrl { get; set; }
-        [Required]
         public IFormFile? StudentIdCardUrl { get; set; }
-        [Required]
-        public string Role { get; set; } = string.Empty;
-        [Required]
         public string? StudentId { get; set; }
-        public bool Verified { get; set; } = false;
-        public string VerificationStatus { get; set; } = "Pending";
         [Required]
         public DriverRequestModel Driver { get; set; } = new DriverRequestModel();
 
@@ -40,14 +34,14 @@ namespace F_Driver.API.Payloads.Request
                 Name = Name,
                 Email = Email,
                 PhoneNumber = PhoneNumber,
-                PasswordHash = PasswordHash,
+                PasswordHash = SecurityUtil.Hash(Password),
                 ProfileImageUrl = ProfileImageUrl,
                 StudentIdCardUrl = StudentIdCardUrl,
-                Role = Role,
+                Role = UserRoleEnum.DRIVER,
                 StudentId = StudentId,
-                Verified = Verified,
-                VerificationStatus = VerificationStatus,
-                IsMailValid = IsMailValid
+                Verified = false,
+                VerificationStatus = UserVerificationStatusEnum.PENDING,
+                IsMailValid = false
 
             };
             // If the role is "driver", map the Driver model
