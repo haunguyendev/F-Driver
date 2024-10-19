@@ -34,7 +34,7 @@ namespace F_Driver.API.Payloads.Request
                 Name = Name,
                 Email = Email,
                 PhoneNumber = PhoneNumber,
-                PasswordHash = SecurityUtil.Hash(Password),
+                PasswordHash = Password,
                 ProfileImageUrl = ProfileImageUrl,
                 StudentIdCardUrl = StudentIdCardUrl,
                 Role = UserRoleEnum.DRIVER,
