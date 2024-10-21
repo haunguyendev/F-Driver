@@ -173,5 +173,21 @@ namespace F_Driver.Service.Services
             return new PaginatedList<ZoneModel>(zoneModels, totalCount, filterRequest.Page, filterRequest.PageSize);
         }
 
+        public async Task<bool> DeleteZoneAsync(int zoneId)
+        {
+            var zone = await _unitOfWork.Zones.GetByIdAsync(zoneId);
+            if (zone == null)
+            {
+                return false; // Category not found
+            }
+           
+
+            // Update category status tocategory.Status = "Deleted";
+            await _unitOfWork.Zones.DeleteAsync(zone);
+            await _unitOfWork.CommitAsync();
+
+            return true;
+        }
+
     }
 }

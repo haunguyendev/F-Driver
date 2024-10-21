@@ -34,7 +34,7 @@ namespace F_Driver.API.Payloads.Request
                 Name = Name,
                 Email = Email,
                 PhoneNumber = PhoneNumber,
-                PasswordHash = SecurityUtil.Hash(Password),
+                PasswordHash = Password,
                 ProfileImageUrl = ProfileImageUrl,
                 StudentIdCardUrl = StudentIdCardUrl,
                 Role = UserRoleEnum.DRIVER,
@@ -45,7 +45,7 @@ namespace F_Driver.API.Payloads.Request
 
             };
             // If the role is "driver", map the Driver model
-            if (Role.ToLower() == "driver" && Driver != null)
+            if (Driver != null)
             {
                 userModel.Driver = Driver.MapToDriverModel(Vehicle);
             }
