@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using F_Driver.DataAccessObject.Models;
 using F_Driver.Repository.Interfaces;
+using F_Driver.Repository.Repositories;
 using F_Driver.Service.BusinessModels;
+using F_Driver.Service.BusinessModels.QueryParameters;
+using F_Driver.Service.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -105,5 +108,66 @@ namespace F_Driver.Service.Services
             }
             return false;
         }
+
+        #region get all filter
+        public async Task<PaginatedList<PriceTableModel>> GetAllPriceTablesAsync(PriceTableQueryParams parameters)
+        {
+            // Query cơ bản
+            var query = _unitOfWork.PriceTables.FindAll();
+
+            // Lọc theo FromZoneId
+            if (parameters.FromZoneId.HasValue)
+            {
+                query = query.Where(pt => pt.FromZoneId == parameters.FromZoneId.Value);
+            }
+
+            // Lọc theo ToZoneId
+            if (parameters.ToZoneId.HasValue)
+            {
+                query = query.Where(pt => pt.ToZoneId == parameters.ToZoneId.Value);
+            }
+
+            // Lọc theo giá tối thiểu và tối đa
+            if (parameters.MinUnitPrice.HasValue)
+            {
+                query = query.Where(pt => pt.UnitPrice >= parameters.MinUnitPrice.Value);
+            }
+
+            if (parameters.MaxUnitPrice.HasValue)
+            {
+                query = query.Where(pt => pt.UnitPrice <= parameters.MaxUnitPrice.Value);
+            }
+
+            // Sắp xếp theo trường và thứ tự
+            if (!string.IsNullOrWhiteSpace(parameters.Sort))
+            {
+                var sortBy = parameters.Sort;
+                var sortOrder = parameters.SortOrder?.ToLower() == "desc" ? "desc" : "asc";
+
+                query = sortOrder == "desc" ? query.OrderByDescending(pt => EF.Property<object>(pt, sortBy))
+                                            : query.OrderBy(pt => EF.Property<object>(pt, sortBy));
+            }
+            else
+            {
+                // Sắp xếp mặc định theo FromZoneId và ToZoneId nếu không có tham số Sort
+                query = query.OrderBy(pt => pt.FromZoneId).ThenBy(pt => pt.ToZoneId);
+            }
+
+            // Tính toán tổng số bảng giá
+            var totalCount = await query.CountAsync();
+
+            // Phân trang
+            var priceTables = await query.Skip((parameters.Page - 1) * parameters.PageSize)
+                                         .Take(parameters.PageSize)
+                                         .ToListAsync();
+
+            // Map PriceTable entity sang PriceTableResponseModel
+            var priceTableDtos = _mapper.Map<List<PriceTableModel>>(priceTables);
+
+            // Trả về kết quả phân trang
+            return new PaginatedList<PriceTableModel>(priceTableDtos, totalCount, parameters.Page, parameters.PageSize);
+        }
+
+        #endregion
     }
 }
