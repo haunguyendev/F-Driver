@@ -1,9 +1,13 @@
 ﻿using F_Driver.API.Common;
 using F_Driver.API.Payloads.Request;
 using F_Driver.API.Payloads.Response;
+using F_Driver.Service.BusinessModels;
+using F_Driver.Service.BusinessModels.QueryParameters;
+using F_Driver.Service.Helpers;
 using F_Driver.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace F_Driver.API.Controllers
 {
@@ -98,5 +102,33 @@ namespace F_Driver.API.Controllers
             await _priceTableService.DeletePriceTable(priceTableId);
             return NoContent();
         }
+        #region
+        [HttpGet]
+        [SwaggerOperation(
+       Summary = "Get all price tables",
+       Description = "Returns a list of all price tables with optional filters, sorting, and pagination."
+   )]
+        [SwaggerResponse(200, "Price tables retrieved successfully", typeof(PaginatedList<PriceTableModel>))]
+        [SwaggerResponse(400, "Invalid request")]
+        [SwaggerResponse(500, "An error occurred while retrieving price tables")]
+        public async Task<IActionResult> GetAllPriceTables([FromQuery] PriceTableQueryParams parameters)
+        {
+            try
+            {
+                // Gọi service để lấy danh sách phân trang và lọc theo các tiêu chí
+                var priceTables = await _priceTableService.GetAllPriceTablesAsync(parameters);
+
+                return Ok(ApiResult<PaginatedList<PriceTableModel>>.Succeed(priceTables));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ApiResult<string>.Error(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResult<string>.Error(ex.Message));
+            }
+        }
+        #endregion
     }
 }
