@@ -12,7 +12,6 @@ public partial class User : EntityBase
    
 
     [StringLength(255)]
-    [Unicode(false)]
     public string Name { get; set; } = null!;
 
     [StringLength(255)]
