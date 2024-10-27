@@ -27,6 +27,7 @@ namespace F_Driver.API.Controllers
             
         }
         #region 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
