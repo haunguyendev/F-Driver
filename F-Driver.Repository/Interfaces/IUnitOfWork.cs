@@ -26,6 +26,7 @@ namespace F_Driver.Repository.Interfaces
         IVehicleRepository Vehicles { get; }
         IWalletRepository Wallets { get; }
         IZoneRepository Zones { get; }
+        IAdminRepository Admins { get; }
 
         FDriverContext GetDbContext();
 

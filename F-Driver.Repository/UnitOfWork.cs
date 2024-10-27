@@ -42,12 +42,14 @@ namespace F_Driver.Repository
 
         public IZoneRepository Zones { get; }
 
+        public IAdminRepository Admins { get; }
+
         public FDriverContext GetDbContext()
         {
             return _context;
         }
 
-        public UnitOfWork(FDriverContext context, ICancellationReasonRepository cancellationReasons, ICancellationRepository cancellations, IDriverRepository driver, IFeedbackRepository feedbacks, IMessageRepository messages, IPaymentRepository payments, IPriceTableRepository priceTables, ITransactionRepository transactions, ITripMatchRepository tripMatches, ITripRequestRepository tripRequests, IUserRepository users, IVehicleRepository vehicles, IWalletRepository wallets, IZoneRepository zones)
+        public UnitOfWork(FDriverContext context, ICancellationReasonRepository cancellationReasons, ICancellationRepository cancellations, IDriverRepository driver, IFeedbackRepository feedbacks, IMessageRepository messages, IPaymentRepository payments, IPriceTableRepository priceTables, ITransactionRepository transactions, ITripMatchRepository tripMatches, ITripRequestRepository tripRequests, IUserRepository users, IVehicleRepository vehicles, IWalletRepository wallets, IZoneRepository zones,IAdminRepository admins)
         {
             _context = context;
             CancellationReasons = cancellationReasons;
@@ -64,6 +66,7 @@ namespace F_Driver.Repository
             Vehicles = vehicles;
             Wallets = wallets;
             Zones = zones;
+            Admins = admins;
         }
 
         public void Dispose()
