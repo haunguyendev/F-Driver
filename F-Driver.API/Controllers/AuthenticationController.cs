@@ -26,76 +26,84 @@ namespace F_Driver.API.Controllers
             _userService = userService; 
             
         }
-        #region api login for driver
+        #region 
         [AllowAnonymous]
-        [HttpPost("drivers/login")]
-        public async Task<IActionResult> LoginDriver([FromBody] LoginRequest request)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                .Select(e => e.ErrorMessage)
+                                                .ToList();
+                return BadRequest(ApiResult<Dictionary<string, string[]>>.Error(new Dictionary<string, string[]>
+        {
+            { "Errors", errors.ToArray() }
+        }));
+            }
+            var handler = new JwtSecurityTokenHandler();
             try
             {
-                var res =  _identityService.LoginDriver(request.Email, request.Password);
-
-                if (!res.Authenticated)
-                {                  
-                    var resultFail = new LoginResponse
-                    {
-                        AccessToken = null,
-                        RefreshToken = null
-                    };                   
-                    return BadRequest(ApiResult<LoginResponse>.Fail(new Exception("Login failed. Please check your credentials or verify if the account is a driver.")));
-                }
-             
-                var handler = new JwtSecurityTokenHandler();
-                var result = new LoginResponse
+                if (loginRequest.Role.ToLower() == "passenger")
                 {
-                    AccessToken = handler.WriteToken(res.Token),
-                    RefreshToken = handler.WriteToken(res.RefreshToken)
-                };
-
-                return Ok(ApiResult<LoginResponse>.Succeed(result));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult<string>.Fail(ex));
-            }
-        }
-
-        #endregion
-
-        [AllowAnonymous]
-        [HttpPost("passengers/google/login")]
-        public async Task<IActionResult> GoogleLoginPassenger([FromBody] LoginGoogleRequest request)
-        {
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                var res = await _identityService.LoginGooglePassenger(request.IdToken);
-
-                if (!res.Authenticated)
-                {
-                    var resultFail = new LoginResponse
+                    if (string.IsNullOrEmpty(loginRequest.IdToken))
                     {
-                        AccessToken = null,
-                        RefreshToken = null
+                        return BadRequest("ID Token is required for Passenger login.");
+                    }
+
+                    var res = await _identityService.LoginGooglePassenger(loginRequest.IdToken);
+                    var result = new LoginResponse
+                    {
+                        AccessToken = handler.WriteToken(res.Token),
+                        RefreshToken = handler.WriteToken(res.RefreshToken)
                     };
 
-                    return BadRequest(ApiResult<LoginResponse>.Fail(new Exception("Login failed. Please check your credentials.")));
+                    return Ok(ApiResult<LoginResponse>.Succeed(result));
                 }
-
-                
-                var result = new LoginResponse
+                else if (loginRequest.Role.ToLower() == "driver")
                 {
-                    AccessToken = handler.WriteToken(res.Token),
-                    RefreshToken = handler.WriteToken(res.RefreshToken)
-                };
+                    if (string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+                    {
+                        return BadRequest("Email and Password are required for Driver login.");
+                    }
 
-                return Ok(ApiResult<LoginResponse>.Succeed(result));
+                    var res = _identityService.LoginDriver(loginRequest.Email, loginRequest.Password);
+                    var result = new LoginResponse
+                    {
+                        AccessToken = handler.WriteToken(res.Token),
+                        RefreshToken = handler.WriteToken(res.RefreshToken)
+                    };
+
+                    return Ok(ApiResult<LoginResponse>.Succeed(result));
+                }
+                else if (loginRequest.Role.ToLower() == "admin")
+                {
+                    if (string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+                    {
+                        return BadRequest("Email and Password are required for Admin login.");
+                    }
+
+                    var res = _identityService.LoginAdmin(loginRequest.Email, loginRequest.Password);
+                    var result = new LoginResponse
+                    {
+                        AccessToken = handler.WriteToken(res.Token),
+                        RefreshToken = handler.WriteToken(res.RefreshToken)
+                    };
+
+                    return Ok(ApiResult<LoginResponse>.Succeed(result));
+                }
+                else
+                {
+                    return BadRequest("Invalid role.");
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest(ApiResult<string>.Fail(ex));
             }
+
         }
+            #endregion
         #region api get information
         [Authorize]
         [HttpGet("users/profile")]

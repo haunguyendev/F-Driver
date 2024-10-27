@@ -50,6 +50,7 @@ public partial class FDriverContext : DbContext
     public virtual DbSet<Wallet> Wallets { get; set; }
 
     public virtual DbSet<Zone> Zones { get; set; }
+    public virtual DbSet<Admin> Admins { get; set; }
 
     //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //{

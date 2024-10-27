@@ -1,8 +1,16 @@
-﻿namespace F_Driver.API.Payloads.Request
+﻿using F_Driver.API.Validation;
+using System.ComponentModel.DataAnnotations;
+
+namespace F_Driver.API.Payloads.Request
 {
     public class LoginRequest
     {
-        public string Email { get; set; } = null!;
-        public string Password { get; set; } = null!;
+        
+        public string? IdToken { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+        [Required]
+        [RoleValidator]
+        public string Role { get; set; }
     }
 }

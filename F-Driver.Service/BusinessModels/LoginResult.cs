@@ -13,6 +13,5 @@ namespace F_Driver.Service.BusinessModels
         public SecurityToken? Token { get; set; }
 
         public SecurityToken? RefreshToken { get; set; }
-        public string? Message { get; set; }
     }
 }

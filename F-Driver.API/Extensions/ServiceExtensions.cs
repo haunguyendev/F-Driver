@@ -222,6 +222,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<IVehicleRepository, VehicleRepository>()
                 .AddScoped<IWalletRepository, WalletRepository>()
                 .AddScoped<IZoneRepository, ZoneRepository>()
+                .AddScoped<IAdminRepository,AdminRepository>()
                 .AddScoped<IUnitOfWork, UnitOfWork>()
                 .AddScoped<JwtSettings>()
                 .AddScoped<GoogleAuthSettings>()
