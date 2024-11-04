@@ -29,7 +29,10 @@ namespace F_Driver.API.Extensions
             services.AddScoped<ExceptionMiddleware>();
             services.AddControllers()
                     .AddJsonOptions(x =>
-                        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); // Ngăn không tuần tự hóa vòng lặp
+                        {
+                            x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                            x.JsonSerializerOptions.Encoder=System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+                            }); // Ngăn không tuần tự hóa vòng lặp
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.AddMemoryCache();
@@ -228,6 +231,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<IVehicleRepository, VehicleRepository>()
                 .AddScoped<IWalletRepository, WalletRepository>()
                 .AddScoped<IZoneRepository, ZoneRepository>()
+                .AddScoped<IAdminRepository,AdminRepository>()
                 .AddScoped<IUnitOfWork, UnitOfWork>()
                 .AddScoped<JwtSettings>()
                 .AddScoped<GoogleAuthSettings>()

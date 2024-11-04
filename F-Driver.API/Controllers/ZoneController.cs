@@ -7,10 +7,11 @@ using F_Driver.Service.BusinessModels.QueryParameters;
 using F_Driver.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace F_Driver.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/zones")]
     [ApiController]
     public class ZoneController : ControllerBase
     {
@@ -125,6 +126,44 @@ namespace F_Driver.API.Controllers
             {
                 // Xử lý ngoại lệ
                 return BadRequest(ApiResult<string>.Fail(ex));
+            }
+        }
+        // api delete zone
+        [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "Delete a zone"
+     
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Zone deleted successfully", typeof(ApiResult<object>))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Zone not found", typeof(ApiResult<object>))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "An error occurred while deleting the Zone", typeof(ApiResult<object>))]
+        public async Task<IActionResult> DeleteZone([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                .Select(e => e.ErrorMessage)
+                                                .ToList();
+                return BadRequest(ApiResult<Dictionary<string, string[]>>.Error(new Dictionary<string, string[]>
+        {
+            { "Errors", errors.ToArray() }
+        }));
+            }
+
+            try
+            {
+                var deleteResult = await _zoneService.DeleteZoneAsync(id);
+
+                if (!deleteResult)
+                {
+                    return NotFound(ApiResult<object>.Error(new { Message = "Category not found" }));
+                }
+
+                return Ok(ApiResult<object>.Succeed(new { Message = "Category deleted successfully" }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResult<object>.Fail(ex));
             }
         }
     }

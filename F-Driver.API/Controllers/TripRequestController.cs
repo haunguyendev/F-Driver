@@ -12,7 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace F_Driver.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/triprequests")]
     [ApiController]
     public class TripRequestController : ControllerBase
     {
@@ -74,7 +74,7 @@ namespace F_Driver.API.Controllers
         }
 
         #region api passenger cancel trip request
-        [HttpPut("cancel-trip-request")]
+        [HttpPut("{id}")]
         [SwaggerOperation(
     Summary = "Cancel trip request",
     Description = "Allows a passenger to cancel a trip request before a trip match is made."
@@ -84,7 +84,7 @@ namespace F_Driver.API.Controllers
         [SwaggerResponse(404, "Trip request not found")]
         [SwaggerResponse(401, "Unauthorized")]
         [SwaggerResponse(500, "An error occurred while canceling the trip request")]
-        public async Task<IActionResult> CancelTripRequest([FromQuery] int requestId)
+        public async Task<IActionResult> CancelTripRequest([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
@@ -122,7 +122,7 @@ namespace F_Driver.API.Controllers
                 var passengerId = int.Parse(passengerClaim.Value);
 
                 // Gọi service để hủy yêu cầu với passengerId
-                await _tripRequestService.CancelTripRequestAsync(requestId, passengerId);
+                await _tripRequestService.CancelTripRequestAsync(id, passengerId);
 
                 return Ok(ApiResult<string>.Succeed("Trip request canceled successfully."));
             }

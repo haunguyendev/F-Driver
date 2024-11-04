@@ -45,41 +45,23 @@ namespace F_Driver.Service.Services
             // Tìm người dùng bằng email
             var user = _unitOfWork.Users.FindByCondition(c => c.Email == email).FirstOrDefault();
 
-            if (user is null)
+            if (user == null)
             {
-                // Trả về nếu không tìm thấy người dùng
-                return new LoginResult
-                {
-                    Authenticated = false,
-                    Token = null,
-                    RefreshToken = null,
-                    Message = "Email not found."
-                };
+                // Throw exception khi không tìm thấy người dùng
+                throw new Exception("Email not found.");
             }
 
-            // Kiểm tra xem người dùng có phải tài xế không
+            // Kiểm tra xem người dùng có phải là tài xế không
             if (!user.Role.Equals("Driver", StringComparison.OrdinalIgnoreCase))
             {
-                return new LoginResult
-                {
-                    Authenticated = false,
-                    Token = null,
-                    RefreshToken = null,
-                    Message = "User is not a driver."
-                };
+                throw new Exception("User is not a driver.");
             }
 
             // Kiểm tra mật khẩu
             var hash = SecurityUtil.Hash(password);
             if (!user.PasswordHash.Equals(hash))
             {
-                return new LoginResult
-                {
-                    Authenticated = false,
-                    Token = null,
-                    RefreshToken = null,
-                    Message = "Incorrect password."
-                };
+                throw new Exception("Incorrect password.");
             }
 
             // Đăng nhập thành công, trả về token
@@ -92,6 +74,29 @@ namespace F_Driver.Service.Services
         }
 
 
+        #endregion
+        #region login for admin
+        public LoginResult LoginAdmin(string email, string password)
+        {
+            // Tìm người dùng bằng email
+            var user = _unitOfWork.Admins.FindByCondition(c => c.Email == email).FirstOrDefault();
+
+            if (user == null)
+            {
+                throw new Exception("Email not found.");
+            }
+            if (!user.Password.Equals(password))
+            {
+                throw new Exception("Incorrect password.");
+            }
+
+            return new LoginResult
+            {
+                Authenticated = true,
+                Token = CreateJwtTokenAdmin(user),
+                RefreshToken = CreateJwtRefreshTokenAdmin(user)
+            };
+        }
         #endregion
         #region login google
         public async Task<LoginResult> LoginGooglePassenger(string token)
@@ -151,18 +156,12 @@ namespace F_Driver.Service.Services
                     Authenticated = true,
                     Token = tokenResponse,
                     RefreshToken = tokenRefreshResponse,
-                    Message = "Login Successfully!"
+                    
                 };
             }
             catch (Exception ex)
             {
-                return new LoginResult
-                {
-                    Authenticated = false,
-                    Token = null,
-                    RefreshToken = null,
-                    Message = "Login failed!"
-                };
+                throw new Exception("Google login failed.", ex);
             }
         }
 
@@ -204,6 +203,61 @@ namespace F_Driver.Service.Services
         new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
         new(JwtRegisteredClaimNames.Email, user.Email),
         new(ClaimTypes.Role, user.Role),
+        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
+
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(authClaims),
+                Expires = utcNow.Add(TimeSpan.FromDays(5)),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+            };
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.CreateToken(tokenDescriptor);
+
+            return token;
+        }
+
+        #endregion
+
+        #region Create access token and refresh token for admin
+        public SecurityToken CreateJwtTokenAdmin(Admin user)
+        {
+            var utcNow = DateTime.UtcNow;
+            var authClaims = new List<Claim>
+    {
+        new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+        new(JwtRegisteredClaimNames.Email, user.Email),
+        new(ClaimTypes.Role, "Admin"), //
+        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
+
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(authClaims),
+                Expires = utcNow.Add(TimeSpan.FromHours(1)),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+            };
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.CreateToken(tokenDescriptor);
+
+            return token;
+        }
+
+        private SecurityToken CreateJwtRefreshTokenAdmin(Admin user)
+        {
+            var utcNow = DateTime.UtcNow;
+            var authClaims = new List<Claim>
+    {
+        new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+        new(JwtRegisteredClaimNames.Email, user.Email),
+        new(ClaimTypes.Role, "Admin"),
         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
 

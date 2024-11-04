@@ -11,7 +11,6 @@ public partial class CancellationReason : EntityBase
   
 
     [StringLength(255)]
-    [Unicode(false)]
     public string Content { get; set; } = null!;
 
     [InverseProperty("Reason")]

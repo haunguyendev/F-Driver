@@ -48,7 +48,7 @@ namespace F_Driver.API.Controllers
             await _emailService.SendEmailAsync(mailData);
         }
         #endregion
-        [HttpPost("create")]
+        [HttpPost("")]
         public async Task<IActionResult> CreateUser([FromForm] UserRequestModel userRequest)
         {
             if (!ModelState.IsValid)
@@ -58,15 +58,8 @@ namespace F_Driver.API.Controllers
 
             try
             {
-                var check = userRequest.Verified;
-                if (userRequest.Verified == true && !userRequest.VerificationStatus.Equals("Pending", StringComparison.OrdinalIgnoreCase))
-                {
-                    return BadRequest(new { message = "Verification status must be 'Spending' if user is verified" });
-                }
-                if (userRequest.IsMailValid == true)
-                {
-                    return BadRequest(new { message = "Mail validation must be verified by admin" });
-                }
+                
+               
                 if (userRequest.Driver.Verified == true)
                 {
                     return BadRequest(new { message = "Driver must be verified by admin" });

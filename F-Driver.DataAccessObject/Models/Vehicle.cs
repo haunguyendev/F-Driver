@@ -18,7 +18,6 @@ public partial class Vehicle : EntityBase
     public string LicensePlate { get; set; } = null!;
 
     [StringLength(50)]
-    [Unicode(false)]
     public string VehicleType { get; set; } = null!;
 
     public bool? IsVerified { get; set; }

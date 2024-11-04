@@ -11,11 +11,11 @@ public partial class Zone : EntityBase
     
 
     [StringLength(255)]
-    [Unicode(false)]
+    
     public string ZoneName { get; set; } = null!;
 
     [StringLength(255)]
-    [Unicode(false)]
+
     public string? Description { get; set; }
 
     [InverseProperty("FromZone")]
