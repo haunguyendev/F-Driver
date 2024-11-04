@@ -214,6 +214,15 @@ namespace F_Driver.Service.Services
 
             if (user != null)
             {
+                // Tạo ví mới với số dư là 0
+                var wallet = new Wallet
+                {
+                    //User = user,
+                    UserId = user.Id,
+                    Balance = 0, // Khởi tạo số dư là 0
+                    CreatedAt = DateTime.Now
+                };
+                await _unitOfWork.Wallets.CreateAsync(wallet);
                 await _unitOfWork.Users.UpdateAsync(user);
                 await _unitOfWork.CommitAsync();
             }

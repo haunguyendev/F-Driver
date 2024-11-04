@@ -70,8 +70,8 @@ namespace F_Driver.Service.Services
             }
 
             // Kiểm tra mật khẩu
-            //var hash = SecurityUtil.Hash(password);
-            if (!user.PasswordHash.Equals(password))
+            var hash = SecurityUtil.Hash(password);
+            if (!user.PasswordHash.Equals(hash))
             {
                 return new LoginResult
                 {
