@@ -45,7 +45,7 @@ namespace F_Driver.Service.Services
             }
         }
 
-
+        
         //Create trip request
         public async Task<bool> CreateTripRequest(TripRequestModel tripRequestModel)
         {
@@ -166,6 +166,32 @@ namespace F_Driver.Service.Services
 
 
         #endregion
+
+        //check wallet before create trip request
+        public async Task<bool> CheckWallet(TripRequestModel tripRequestModel) {
+            var priceThisRequest = await _unitOfWork.PriceTables.FindByCondition(tp => tp.FromZoneId == tripRequestModel.FromZoneId && tp.ToZoneId == tripRequestModel.ToZoneId).FirstOrDefaultAsync();
+            if (priceThisRequest == null)
+            {
+                return false;
+            }
+            //total price
+            var totalPrice = priceThisRequest.UnitPrice;
+            var listTripRequest = _unitOfWork.TripRequests.FindAll().Where(t => t.UserId == tripRequestModel.UserId).ToList();
+            foreach (var tripRequest in listTripRequest)
+            {
+                totalPrice += tripRequest.Price;
+            }
+            var wallet = await _unitOfWork.Wallets.FindByCondition(w => w.UserId == tripRequestModel.UserId).FirstOrDefaultAsync();
+            if (wallet == null)
+            {
+                return false;
+            }
+            if (wallet.Balance < totalPrice)
+            {
+                return false;
+            }
+            return true;
+        }
 
     }
 }

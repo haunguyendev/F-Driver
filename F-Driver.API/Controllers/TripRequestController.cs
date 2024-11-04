@@ -31,6 +31,11 @@ namespace F_Driver.API.Controllers
             {
                 return BadRequest(ModelState);
             }
+            var checkWalet = await _tripRequestService.CheckWallet(tripRequestModel.MapToTripRequestModel());
+            if (!checkWalet)
+            {
+                return BadRequest(ApiResult<string>.Error("Not enough balance to create trip request."));
+            }
             var tripRequest = await _tripRequestService.CreateTripRequest(tripRequestModel.MapToTripRequestModel());
             if (!tripRequest)
             {
