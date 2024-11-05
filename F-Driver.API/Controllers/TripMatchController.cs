@@ -4,6 +4,7 @@ using F_Driver.API.Payloads.Response;
 using F_Driver.Service.BuisnessModels.QueryParameters;
 using F_Driver.Service.BusinessModels;
 using F_Driver.Service.BusinessModels.QueryParameters;
+using F_Driver.Service.Helpers;
 using F_Driver.Service.Services;
 using F_Driver.Service.Shared;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,9 @@ namespace F_Driver.API.Controllers
 
         //get trip match with filter
         [HttpGet]
+        [SwaggerResponse(200, "Price tables retrieved successfully", typeof(PaginatedList<TripMatchModel>))]
+        [SwaggerResponse(400, "Invalid request")]
+        [SwaggerResponse(500, "An error occurred while retrieving price tables")]
         public async Task<IActionResult> GetTripRequests([FromQuery] TripMatchQueryParameters parameters)
         {
             try

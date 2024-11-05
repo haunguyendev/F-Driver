@@ -205,10 +205,7 @@ namespace F_Driver.API.Controllers
 
             try
             {
-                if(id != userRequest.Id)
-                {
-                    return BadRequest(new { message = "Id is not match" });
-                }
+               
                 var user = await _userService.GetUserById(id);
                 if (user == null)
                 {
