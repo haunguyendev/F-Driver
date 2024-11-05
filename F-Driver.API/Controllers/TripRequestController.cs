@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using F_Driver.Service.BuisnessModels.QueryParameters;
 using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
+using F_Driver.Service.Helpers;
 
 namespace F_Driver.API.Controllers
 {
@@ -41,6 +42,9 @@ namespace F_Driver.API.Controllers
         }
 
         [HttpGet]
+        [SwaggerResponse(200, "Price tables retrieved successfully", typeof(PaginatedList<TripRequestModel>))]
+        [SwaggerResponse(400, "Invalid request")]
+        [SwaggerResponse(500, "An error occurred while retrieving price tables")]
         public async Task<IActionResult> GetTripRequests([FromQuery] TripRequestQueryParameters parameters)
         {
             try

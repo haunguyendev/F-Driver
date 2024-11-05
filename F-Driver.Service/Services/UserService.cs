@@ -8,6 +8,7 @@ using F_Driver.Service.BusinessModels.QueryParameters;
 using F_Driver.Service.Helpers;
 using F_Driver.Service.Shared;
 using FirebaseAdmin.Messaging;
+using Google.Apis.Oauth2.v2.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -328,42 +329,49 @@ namespace F_Driver.Service.Services
         #endregion
 
         #region update user passenger async
-        public async Task<bool> UpdateProfilePassenger(int id, CreateUserModel createUserModel)
+        public async Task<bool> UpdateProfilePassenger(int id, UpdatePassengerModel updateModel)
         {
             try
             {
-                var userInDb = await _unitOfWork.Users.GetByIdAsync(id);
-                if (userInDb == null)
+                var passenger = await _unitOfWork.Users.GetByIdAsync(id);
+                if (passenger == null)
                 {
-                    return false;
+                    throw new Exception("Passenger not found.");
                 }
-                var profileImageUrl = userInDb.ProfileImageUrl;
-                var studentIdCardUrl = userInDb.StudentIdCardUrl;
-                //map createUserModel to userInDb
-                _mapper.Map(createUserModel, userInDb);
-
-                if (createUserModel.ProfileImageUrl != null && createUserModel.ProfileImageUrl.Length > 0)
+                if (!string.IsNullOrEmpty(updateModel.Name))
                 {
-                    var profileImagePath = $"USER/{id}/ProfileImage";
-                    userInDb.ProfileImageUrl = await _firebaseService.UploadFileToFirebase(createUserModel.ProfileImageUrl, profileImagePath);
+                    passenger.Name = updateModel.Name;
                 }
-                else
+                if (!string.IsNullOrEmpty(updateModel.Email))
                 {
-                    userInDb.ProfileImageUrl = profileImageUrl;
+                    passenger.Email = updateModel.Email;
                 }
-
-                if (createUserModel.StudentIdCardUrl != null && createUserModel.StudentIdCardUrl.Length > 0)
+                if (!string.IsNullOrEmpty(updateModel.PhoneNumber))
                 {
+                    passenger.PhoneNumber = updateModel.PhoneNumber;
+                }
+                if (!string.IsNullOrEmpty(updateModel.ProfileImageUrl))
+                {
+                    passenger.ProfileImageUrl = updateModel.ProfileImageUrl;
+                }
+                if (updateModel.StudentIdCardUrl != null)
+                {
+                    // Logic lưu trữ ảnh lên server và lấy URL (giả sử bạn có phương thức lưu trữ ảnh)
                     var studentIdCardPath = $"USER/{id}/StudentIdCard";
-                    userInDb.StudentIdCardUrl = await _firebaseService.UploadFileToFirebase(createUserModel.StudentIdCardUrl, studentIdCardPath);
+                    passenger.StudentIdCardUrl = await _firebaseService.UploadFileToFirebase(updateModel.StudentIdCardUrl, studentIdCardPath);
                 }
-                else
+                if (!string.IsNullOrEmpty(updateModel.StudentId))
                 {
-                    userInDb.StudentIdCardUrl = studentIdCardUrl;
+                    passenger.StudentId = updateModel.StudentId;
                 }
-                userInDb.CreatedAt = DateTime.Now;
+                if (updateModel.StudentIdCardUrl != null || !string.IsNullOrEmpty(updateModel.StudentId))
+                {
+                    passenger.VerificationStatus = UserVerificationStatusEnum.PENDING;
+                }
 
-                await _unitOfWork.Users.UpdateAsync(userInDb);
+               
+
+                await _unitOfWork.Users.UpdateAsync(passenger);
                 var rs = await _unitOfWork.CommitAsync();
                 if (rs > 0)
                 {
