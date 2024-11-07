@@ -5,10 +5,12 @@ using F_Driver.Service.Settings.VNPay;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Sprache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace F_Driver.Service.Services
@@ -45,7 +47,7 @@ namespace F_Driver.Service.Services
                 
                     var vnPayRequest = new CreateVNPayModel(_vnPaySettings.Version,
                     _vnPaySettings.TmnCode, DateTime.Now, "127.0.0.1" ?? string.Empty, amount ?? 0, "VND",
-                        "other", $"Update wallet's user id {userId}", _vnPaySettings.ReturnUrl, userId!.ToString() ?? string.Empty);
+                        "other", $"Update wallet's user id {userId}", _vnPaySettings.ReturnUrl, Guid.NewGuid().ToString() ?? string.Empty);
                     paymentUrl = _vnPayService.GetLink(_vnPaySettings.PaymentUrl, _vnPaySettings.HashSecret, vnPayRequest);
                     //Console.WriteLine(paymentUrl);
                 return (true, null, paymentUrl);
@@ -64,7 +66,8 @@ namespace F_Driver.Service.Services
             {
                 return "Invalid signature"; // "RspCode":"97"
             }
-            var wallet = await _unitOfWork.Wallets.FindByCondition(w => w.UserId == int.Parse(updateVNPayModel.vnp_TxnRef)).FirstOrDefaultAsync();
+            var match = Regex.Match(updateVNPayModel.vnp_OrderInfo, @"\d+");
+            var wallet = await _unitOfWork.Wallets.FindByCondition(w => w.UserId == int.Parse(match.Value)).FirstOrDefaultAsync();
             if (wallet == null)
             {
                 return "Wallet not found"; // "RspCode":"02"
