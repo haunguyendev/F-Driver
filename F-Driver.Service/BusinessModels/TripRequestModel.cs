@@ -19,6 +19,8 @@ namespace F_Driver.Service.BusinessModels
         public int FromZoneId { get; set; }
 
         public int ToZoneId { get; set; }
+        public string FromZoneName { get; set; }
+        public string ToZoneName { get; set; }
 
         public DateOnly TripDate { get; set; }
 

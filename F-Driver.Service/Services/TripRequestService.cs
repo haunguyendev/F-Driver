@@ -75,7 +75,7 @@ namespace F_Driver.Service.Services
         //get trips request with filter
         public async Task<PaginatedList<TripRequestModel>> GetTripRequests(TripRequestQueryParameters filterRequest)
         {
-            var query = _unitOfWork.TripRequests.FindAll();
+            var query = _unitOfWork.TripRequests.FindAll(false, [x => x.FromZone,x=>x.ToZone]);
             if (filterRequest.UserId.HasValue)
                 query = query.Where(t => t.UserId == filterRequest.UserId.Value);
 
