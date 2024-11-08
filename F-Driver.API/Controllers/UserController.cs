@@ -286,8 +286,7 @@ namespace F_Driver.API.Controllers
 
         #endregion
         #region api update verified status
-        [Authorize(Roles = "Admin")]
-        [HttpPut("users/{id}/status")]
+        [HttpPut("{id}/status")]
         [SwaggerOperation(
     Summary = "Update passenger verification status",
     Description = "Admin updates the verification status of a passenger (Approve or Reject)."

@@ -37,6 +37,9 @@ namespace F_Driver.Service.Mapper
             CreateMap<PriceTableModel, PriceTable>().ReverseMap();
 
             CreateMap<TripRequestModel, TripRequest>().ReverseMap();
+            CreateMap<TripRequest, TripRequestModel>()
+                .ForMember(dest => dest.FromZoneName, opt => opt.MapFrom(src => src.FromZone.ZoneName))
+                .ForMember(dest => dest.ToZoneName, opt => opt.MapFrom(src => src.ToZone.ZoneName));
 
             CreateMap<TripMatchModel, TripMatch>().ReverseMap()
                 .ForMember(dest => dest.Driver, opt => opt.MapFrom(src => src.Driver))
