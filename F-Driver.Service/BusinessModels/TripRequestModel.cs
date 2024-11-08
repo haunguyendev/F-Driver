@@ -32,8 +32,5 @@ namespace F_Driver.Service.BusinessModels
 
         public DateTime? CreatedAt { get; set; }
 
-        public Zone? FromZone { get; set; }
-
-        public Zone? ToZone { get; set; }
     }
 }
