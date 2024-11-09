@@ -69,7 +69,7 @@ namespace F_Driver.API.Controllers
         [SwaggerResponse(401, "Unauthorized")]
         [SwaggerResponse(404, "Trip request or driver not found")]
         [SwaggerResponse(500, "An error occurred while creating the trip match")]
-        public async Task<ActionResult<IActionResult>> CreateTripMatch([FromBody] TripMatchRequest request)
+        public async Task<ActionResult> CreateTripMatch([FromBody] TripMatchRequest request)
         {
             try
             {
