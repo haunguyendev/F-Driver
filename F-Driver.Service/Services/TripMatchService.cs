@@ -32,9 +32,15 @@ namespace F_Driver.Service.Services
                     t => t.Cancellations,
                     t => t.Feedbacks,
                     t => t.Messages,
-                    t => t.Driver,
+                    t => t.Driver,  
                     t => t.TripRequest,
-                    t => t.Payments
+                    t => t.Payments,
+                    t=>t.Driver.Driver,
+                    t => t.Driver.Driver.Vehicles,
+                     t => t.TripRequest.FromZone,
+                     t => t.TripRequest.ToZone
+
+
             );
 
             // Apply filtering
@@ -78,7 +84,40 @@ namespace F_Driver.Service.Services
                 .Take(filterRequest.PageSize)
                 .ToListAsync();
 
-            var tripMatchModels = _mapper.Map<List<TripMatchReponseModel>>(items);
+           var tripMatchModels = new List<TripMatchReponseModel>();
+
+            foreach (var item in items) { 
+            var tripMatchResponse = _mapper.Map<TripMatchReponseModel>(item);
+                tripMatchResponse.Driver = new DriverInfomation {
+                    Email = item.Driver.Email,
+                    Name=item.Driver.Name,
+                    LicenseImageUrl=item.Driver.Driver.LicenseImageUrl,
+                    LicenseNumber=item.Driver.Driver.LicenseNumber,
+                    LicensePlate = item.Driver.Driver.Vehicles.Select(x=>x.LicensePlate).First(),
+                    ProfileImageUrl=item.Driver.ProfileImageUrl,
+                    VehicleImageUrl=item.Driver.Driver.Vehicles.Select(x=>x.VehicleImageUrl).First(),
+
+                
+                };
+                tripMatchResponse.TripRequest = new TripRequestInfomation
+                {
+                    UserId = (int)item.TripRequest.UserId,
+                    FromZoneId = item.TripRequest.FromZoneId,
+                    ToZoneId = item.TripRequest.ToZoneId,
+                    FromZoneName=item.TripRequest.FromZone.ZoneName,
+                    ToZoneName = item.TripRequest.ToZone.ZoneName,
+                    TripDate = item.TripRequest.TripDate,
+                    StartTime = item.TripRequest.StartTime
+                };
+
+                tripMatchModels.Add(tripMatchResponse);
+
+            
+            
+            
+            }
+
+           
 
             return new PaginatedList<TripMatchReponseModel>(tripMatchModels, totalCount, filterRequest.Page, filterRequest.PageSize);
         }
