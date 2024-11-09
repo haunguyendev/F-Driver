@@ -26,7 +26,7 @@ namespace F_Driver.Service.Services
         }
 
         //get trip match with filter
-        public async Task<PaginatedList<TripMatchModel>> GetAllTripMatchesAsync(TripMatchQueryParameters filterRequest)
+        public async Task<PaginatedList<TripMatchReponseModel>> GetAllTripMatchesAsync(TripMatchQueryParameters filterRequest)
         {
             var query = _unitOfWork.TripMatches.FindAll(false,
                     t => t.Cancellations,
@@ -78,9 +78,9 @@ namespace F_Driver.Service.Services
                 .Take(filterRequest.PageSize)
                 .ToListAsync();
 
-            var tripMatchModels = _mapper.Map<List<TripMatchModel>>(items);
+            var tripMatchModels = _mapper.Map<List<TripMatchReponseModel>>(items);
 
-            return new PaginatedList<TripMatchModel>(tripMatchModels, totalCount, filterRequest.Page, filterRequest.PageSize);
+            return new PaginatedList<TripMatchReponseModel>(tripMatchModels, totalCount, filterRequest.Page, filterRequest.PageSize);
         }
 
         #region
