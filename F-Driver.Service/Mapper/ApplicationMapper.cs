@@ -49,7 +49,11 @@ namespace F_Driver.Service.Mapper
                 .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => src.Messages))
                 .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments));
 
-            CreateMap<TripMatch, TripMatchReponseModel>().ReverseMap();
+            CreateMap<TripMatch, TripMatchReponseModel>()
+                .ForMember(dest=> dest.Driver,opt=>opt.Ignore())
+                .ForMember(dest=>dest.TripRequest,opt=>opt.Ignore())
+                
+            ;
 
             CreateMap<CancellationReason,CancellationReasonModel>().ReverseMap();
             CreateMap<Cancellation,CancellationModel>().ReverseMap();
