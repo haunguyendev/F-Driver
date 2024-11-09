@@ -39,7 +39,7 @@ namespace F_Driver.API.Controllers
                 var tripMatches = await _tripMatchService.GetAllTripMatchesAsync(parameters);
 
                 // Chuẩn bị đối tượng trả về theo kiểu phân trang
-                var paginatedTripMatches = new PaginatedResult<TripMatchModel>
+                var paginatedTripMatches = new PaginatedResult<TripMatchReponseModel>
                 {
                     Page = parameters.Page,
                     PageSize = parameters.PageSize,
@@ -49,7 +49,7 @@ namespace F_Driver.API.Controllers
                 };
 
                 // Trả về kết quả thành công
-                return Ok(ApiResult<PaginatedResult<TripMatchModel>>.Succeed(paginatedTripMatches));
+                return Ok(ApiResult<PaginatedResult<TripMatchReponseModel>>.Succeed(paginatedTripMatches));
             }
             catch (Exception ex)
             {
