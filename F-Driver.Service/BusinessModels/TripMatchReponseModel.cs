@@ -8,6 +8,7 @@ namespace F_Driver.Service.BusinessModels
 {
     public class TripMatchReponseModel
     {
+        public int? Id { get; set; }
         public int? TripRequestId { get; set; }  
         public int? DriverId { get; set; } 
 
