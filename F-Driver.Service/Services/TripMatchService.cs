@@ -24,6 +24,48 @@ namespace F_Driver.Service.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+        //get trip match by id
+        public async Task<TripMatchReponseModel> GetTripMatchById(int id)
+        {
+            var tripMatchesExists = await _unitOfWork.TripMatches.FindByCondition(x=>x.Id == id,false,
+                t => t.Driver.Driver,
+                    t => t.Driver.Driver.Vehicles,
+                     t => t.TripRequest.FromZone,
+                     t => t.TripRequest.ToZone,
+                      t => t.Driver
+                ).FirstOrDefaultAsync();
+
+            if( tripMatchesExists == null ) {
+                throw new Exception("Trip match not found!");
+            }
+
+            var tripMatchResponse = _mapper.Map<TripMatchReponseModel>(tripMatchesExists);
+            tripMatchResponse.Driver = new DriverInfomation
+                 {
+                     Email = tripMatchesExists.Driver.Email,
+                     Name = tripMatchesExists.Driver.Name,
+                     LicenseImageUrl = tripMatchesExists.Driver.Driver.LicenseImageUrl,
+                     LicenseNumber = tripMatchesExists.Driver.Driver.LicenseNumber,
+                     LicensePlate = tripMatchesExists.Driver.Driver.Vehicles.Select(x => x.LicensePlate).First(),
+                     ProfileImageUrl = tripMatchesExists.Driver.ProfileImageUrl,
+                     VehicleImageUrl = tripMatchesExists.Driver.Driver.Vehicles.Select(x => x.VehicleImageUrl).First(),
+
+
+                 };
+            tripMatchResponse.TripRequest = new TripRequestInfomation
+            {
+                UserId = (int)tripMatchesExists.TripRequest.UserId,
+                FromZoneId = tripMatchesExists.TripRequest.FromZoneId,
+                ToZoneId = tripMatchesExists.TripRequest.ToZoneId,
+                FromZoneName = tripMatchesExists.TripRequest.FromZone.ZoneName,
+                ToZoneName = tripMatchesExists.TripRequest.ToZone.ZoneName,
+                TripDate = tripMatchesExists.TripRequest.TripDate,
+                StartTime = tripMatchesExists.TripRequest.StartTime
+            };
+
+            return tripMatchResponse;
+
+        }
 
         //get trip match with filter
         public async Task<PaginatedList<TripMatchReponseModel>> GetAllTripMatchesAsync(TripMatchQueryParameters filterRequest)
