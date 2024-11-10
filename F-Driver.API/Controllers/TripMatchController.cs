@@ -28,7 +28,7 @@ namespace F_Driver.API.Controllers
 
         //get trip match with filter
         [HttpGet]
-        [SwaggerResponse(200, "Price tables retrieved successfully", typeof(PaginatedList<TripMatchModel>))]
+        [SwaggerResponse(200, "Price tables retrieved successfully", typeof(PaginatedList<TripMatchReponseModel>))]
         [SwaggerResponse(400, "Invalid request")]
         [SwaggerResponse(500, "An error occurred while retrieving price tables")]
         public async Task<IActionResult> GetTripRequests([FromQuery] TripMatchQueryParameters parameters)
@@ -57,6 +57,23 @@ namespace F_Driver.API.Controllers
                 return BadRequest(ApiResult<string>.Fail(ex));
             }
         }
+
+        //api get by id 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTripMatchById([FromRoute] int id)
+        {
+            try
+            {
+                var tripmatches = await _tripMatchService.GetTripMatchById(id);
+                return Ok(ApiResult<TripMatchReponseModel>.Succeed(tripmatches));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResult<string>.Fail(ex));
+            }
+        }
+        
 
         #region create trip match
         [HttpPost()]
