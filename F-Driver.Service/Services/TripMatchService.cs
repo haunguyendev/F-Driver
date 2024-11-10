@@ -54,13 +54,18 @@ namespace F_Driver.Service.Services
                  };
             tripMatchResponse.TripRequest = new TripRequestInfomation
             {
+                Id = tripMatchesExists.TripRequest.Id,
                 UserId = (int)tripMatchesExists.TripRequest.UserId,
                 FromZoneId = tripMatchesExists.TripRequest.FromZoneId,
                 ToZoneId = tripMatchesExists.TripRequest.ToZoneId,
                 FromZoneName = tripMatchesExists.TripRequest.FromZone.ZoneName,
                 ToZoneName = tripMatchesExists.TripRequest.ToZone.ZoneName,
                 TripDate = tripMatchesExists.TripRequest.TripDate,
-                StartTime = tripMatchesExists.TripRequest.StartTime
+                StartTime = tripMatchesExists.TripRequest.StartTime,
+                Slot=(int)tripMatchesExists.TripRequest.Slot,
+                Status=tripMatchesExists.TripRequest.Status,
+                CreatedAt=(DateTime)tripMatchesExists.TripRequest.CreatedAt,
+
             };
 
             return tripMatchResponse;
@@ -143,13 +148,18 @@ namespace F_Driver.Service.Services
                 };
                 tripMatchResponse.TripRequest = new TripRequestInfomation
                 {
+                    Id = item.TripRequest.Id,
                     UserId = (int)item.TripRequest.UserId,
                     FromZoneId = item.TripRequest.FromZoneId,
                     ToZoneId = item.TripRequest.ToZoneId,
                     FromZoneName=item.TripRequest.FromZone.ZoneName,
                     ToZoneName = item.TripRequest.ToZone.ZoneName,
                     TripDate = item.TripRequest.TripDate,
-                    StartTime = item.TripRequest.StartTime
+                    StartTime = item.TripRequest.StartTime,
+                    Status=item.TripRequest.Status,
+                    CreatedAt=(DateTime)item.TripRequest.CreatedAt,
+                    Slot=(int)item.TripRequest.Slot,
+                    
                 };
 
                 tripMatchModels.Add(tripMatchResponse);
