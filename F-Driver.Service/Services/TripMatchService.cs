@@ -18,11 +18,13 @@ namespace F_Driver.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly PaymentService _paymentService;
 
-        public TripMatchService(IUnitOfWork unitOfWork, IMapper mapper)
+        public TripMatchService(IUnitOfWork unitOfWork, IMapper mapper, PaymentService paymentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _paymentService = paymentService;
         }
         //get trip match by id
         public async Task<TripMatchReponseModel> GetTripMatchById(int id)
@@ -313,10 +315,11 @@ namespace F_Driver.Service.Services
                 Status = PaymentStatusEnum.Pending,
                 PaidAt = null // Chưa thanh toán
             };
-
+           
             await _unitOfWork.Payments.CreateAsync(payment);
             await _unitOfWork.TripMatches.UpdateAsync(tripMatch);
             await _unitOfWork.CommitAsync();
+            await _paymentService.ConfirmPaymentAsync(payment.Id, driverId);
 
             return true;
         }

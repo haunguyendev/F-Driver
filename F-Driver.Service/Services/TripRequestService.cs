@@ -56,7 +56,14 @@ namespace F_Driver.Service.Services
                 {
                     return false;
                 }
+                var priceTableExists = await _unitOfWork.PriceTables.FindByCondition(x=>x.FromZoneId==tripRequestModel.FromZoneId&&x.ToZoneId==tripRequestModel.ToZoneId).FirstOrDefaultAsync();
+                if(priceTableExists ==null)
+                {
+                    return false;
+                }
+
                 var tripRequest = _mapper.Map<TripRequest>(tripRequestModel);
+                tripRequest.Price=priceTableExists.UnitPrice;
                 await _unitOfWork.TripRequests.CreateAsync(tripRequest);
                 var rs = await _unitOfWork.CommitAsync();
                 if (rs > 0)
