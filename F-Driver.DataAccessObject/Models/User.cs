@@ -64,7 +64,9 @@ public partial class User : EntityBase
     public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
     [InverseProperty("Passenger")]
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public virtual ICollection<Payment> PaymentsOfPassenger { get; set; } = new List<Payment>();
+    [InverseProperty("Driver")]
+    public virtual ICollection<Payment> PaymentsOfDriver { get; set; } = new List<Payment>();
 
     [InverseProperty("User")]
     public virtual ICollection<TripRequest> TripRequests { get; set; } = new List<TripRequest>();

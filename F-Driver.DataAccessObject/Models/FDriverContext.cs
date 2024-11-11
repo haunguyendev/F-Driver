@@ -115,11 +115,11 @@ public partial class FDriverContext : DbContext
             entity.Property(e => e.PaidAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Status).HasDefaultValue("pending");
 
-            entity.HasOne(d => d.Driver).WithMany(p => p.Payments).HasConstraintName("FK__Payments__Driver__656C112C");
+            entity.HasOne(d => d.Driver).WithMany(p => p.PaymentsOfDriver).HasConstraintName("FK__Payments__Driver__656C112C");
 
             entity.HasOne(d => d.Match).WithMany(p => p.Payments).HasConstraintName("FK__Payments__MatchI__6383C8BA");
 
-            entity.HasOne(d => d.Passenger).WithMany(p => p.Payments).HasConstraintName("FK__Payments__Passen__6477ECF3");
+            entity.HasOne(d => d.Passenger).WithMany(p => p.PaymentsOfPassenger).HasConstraintName("FK__Payments__Passen__6477ECF3");
         });
 
         modelBuilder.Entity<PriceTable>(entity =>

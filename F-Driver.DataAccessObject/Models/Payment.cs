@@ -31,14 +31,14 @@ public partial class Payment : EntityBase
     public DateTime? PaidAt { get; set; }
 
     [ForeignKey("DriverId")]
-    [InverseProperty("Payments")]
-    public virtual Driver? Driver { get; set; }
+    [InverseProperty("PaymentsOfDriver")]
+    public virtual User? Driver { get; set; }
 
     [ForeignKey("MatchId")]
     [InverseProperty("Payments")]
     public virtual TripMatch? Match { get; set; }
 
     [ForeignKey("PassengerId")]
-    [InverseProperty("Payments")]
+    [InverseProperty("PaymentsOfPassenger")]
     public virtual User? Passenger { get; set; }
 }

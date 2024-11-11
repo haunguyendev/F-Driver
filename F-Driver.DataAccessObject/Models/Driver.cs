@@ -28,8 +28,7 @@ public partial class Driver : EntityBase
     [InverseProperty("Driver")]
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
-    [InverseProperty("Driver")]
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    
 
     [ForeignKey("UserId")]
     [InverseProperty("Driver")]
