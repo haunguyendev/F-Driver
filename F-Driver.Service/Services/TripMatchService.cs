@@ -228,14 +228,21 @@ namespace F_Driver.Service.Services
             {
                 tripMatch.Status = TripMatchStatusEnum.Accepted;
                 tripRequest.Status = TripRequestStatusEnum.Completed; // Đánh dấu request là đã hoàn thành
-                var listTripMatchs = _unitOfWork.TripMatches.FindByCondition(x => x.TripRequestId == tripMatch.TripRequestId).ToList();
-                listTripMatchs.Remove(tripMatch);
+                await _unitOfWork.TripMatches.UpdateAsync(tripMatch);
+                await _unitOfWork.TripRequests.UpdateAsync(tripRequest);
+                await _unitOfWork.CommitAsync();
+                var listTripMatchs = _unitOfWork.TripMatches.FindByCondition(x => x.TripRequestId == tripMatch.TripRequestId && x.Status==TripMatchStatusEnum.Pending).ToList();
                 listTripMatchs.ForEach(x=>x.Status = TripMatchStatusEnum.Rejected);
                 await _unitOfWork.TripMatches.UpdateListAsync(listTripMatchs);
+                await _unitOfWork.CommitAsync();
+
             }
             else if (status == TripMatchStatusEnum.Rejected)
             {
                 tripMatch.Status = TripMatchStatusEnum.Rejected;
+                await _unitOfWork.TripMatches.UpdateAsync(tripMatch);
+                await _unitOfWork.TripRequests.UpdateAsync(tripRequest);
+                await _unitOfWork.CommitAsync();
             }
             else
             {
@@ -243,9 +250,7 @@ namespace F_Driver.Service.Services
             }
 
             // Lưu thay đổi
-            await _unitOfWork.TripMatches.UpdateAsync(tripMatch);
-            await _unitOfWork.TripRequests.UpdateAsync(tripRequest);
-            await _unitOfWork.CommitAsync();
+           
         }
 
         #endregion

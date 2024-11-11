@@ -84,8 +84,12 @@ namespace F_Driver.Repository.Repositories
             return Task.CompletedTask;
         }
         public async Task UpdateListAsync(IEnumerable<T> entities)
-        => await _dbContext.Set<T>().AddRangeAsync(entities);
-
+        {
+            foreach (var entity in entities)
+            {
+                _dbContext.Set<T>().Update(entity);
+            }           
+        }
 
 
         public Task DeleteAsync(T entity)
