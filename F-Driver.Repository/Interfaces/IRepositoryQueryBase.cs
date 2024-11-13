@@ -35,6 +35,7 @@ namespace F_Driver.Repository.Interfaces
         Task<T?> FindAsync(Expression<Func<T, bool>> predicate);
         Task<List<T>> FindAllAsync(Expression<Func<T, bool>> predicate);
         Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+        Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
 
     }
 }
