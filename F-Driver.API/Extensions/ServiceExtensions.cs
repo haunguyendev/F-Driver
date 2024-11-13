@@ -7,6 +7,7 @@ using F_Driver.Repository.Repositories;
 using F_Driver.Service.Mapper;
 using F_Driver.Service.Services;
 using F_Driver.Service.Settings;
+using F_Driver.Service.Settings.VNPay;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity.Data;
@@ -90,7 +91,14 @@ namespace F_Driver.API.Extensions
                 config.Bucket = Environment.GetEnvironmentVariable("FIREBASE_BUCKET");
             });
 
-
+            services.Configure<VNPaySettings>(config =>
+            {
+                config.Version = Environment.GetEnvironmentVariable("VNPaySettings__Version");
+                config.TmnCode = Environment.GetEnvironmentVariable("VNPaySettings__TmnCode");
+                config.HashSecret = Environment.GetEnvironmentVariable("VNPaySettings__HashSecret");
+                config.ReturnUrl = Environment.GetEnvironmentVariable("VNPaySettings__ReturnUrl");
+                config.PaymentUrl = Environment.GetEnvironmentVariable("VNPaySettings__PaymentUrl");
+            });
 
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -208,6 +216,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<TripRequestService>()
                 .AddScoped<CancellationReasonService>()
                 .AddScoped<DashboardService>()
+                .AddScoped<VNPayService>()
            //Add repository
                 .AddScoped<ICancellationReasonRepository,CancellationReasonRepository>()
                 .AddScoped<ICancellationRepository, CancellationRepository>()

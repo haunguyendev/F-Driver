@@ -189,7 +189,7 @@ namespace F_Driver.Service.Services
                 if (user != null)
                 {
                     user.Verified = true;
-                    user.VerificationStatus = "Verified";
+                    user.VerificationStatus = UserVerificationStatusEnum.VERIFIED;
 
                     if (user.Driver != null)
                     {
@@ -209,12 +209,21 @@ namespace F_Driver.Service.Services
             {
                 if (user != null)
                 {
-                    user.VerificationStatus = "Reject";
+                    user.VerificationStatus = UserVerificationStatusEnum.REJECT;
                 }
             }
 
             if (user != null)
             {
+                // Tạo ví mới với số dư là 0
+                var wallet = new Wallet
+                {
+                    //User = user,
+                    UserId = user.Id,
+                    Balance = 0, // Khởi tạo số dư là 0
+                    CreatedAt = DateTime.Now
+                };
+                await _unitOfWork.Wallets.CreateAsync(wallet);
                 await _unitOfWork.Users.UpdateAsync(user);
                 await _unitOfWork.CommitAsync();
             }
@@ -438,15 +447,15 @@ namespace F_Driver.Service.Services
             }
 
             // Cập nhật trạng thái xác thực dựa trên yêu cầu
-            if (verificationStatus == UserVerificationStatusEnum.APPROVED)
+            if (verificationStatus == UserVerificationStatusEnum.VERIFIED)
             {
                 user.Verified = true;
-                user.VerificationStatus = UserVerificationStatusEnum.APPROVED;
+                user.VerificationStatus = UserVerificationStatusEnum.VERIFIED;
             }
             else if (verificationStatus == UserVerificationStatusEnum.REJECT)
             {
                 user.Verified = false;
-                user.VerificationStatus = UserVerificationStatusEnum.REJECT;
+                user.VerificationStatus = UserVerificationStatusEnum.VERIFIED;
             }
             else
             {
