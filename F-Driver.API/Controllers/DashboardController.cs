@@ -30,5 +30,17 @@ namespace F_Driver.API.Controllers
                 return StatusCode(500, ApiResult<object>.Fail(ex));
             }
         }
+
+        [HttpGet("weekly-statistics")]
+        public async Task<IActionResult> GetWeeklyStatistics(int month, int year)
+        {
+            if (month < 1 || month > 12 || year < 1)
+            {
+                return BadRequest("Invalid month or year.");
+            }
+
+            var result = await _dashboardService.GetWeeklyStatisticsAsync(month, year);
+            return Ok(result);
+        }
     }
 }

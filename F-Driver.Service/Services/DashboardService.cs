@@ -87,5 +87,45 @@ namespace F_Driver.Service.Services
                 TotalZones = totalZones,
             };
         }
+
+        public async Task<WeeklyStatisticsResponseModel> GetWeeklyStatisticsAsync(int month, int year)
+        {
+            var weeklyStatistics = new WeeklyStatisticsResponseModel();
+
+            for (int week = 1; week < 5; week++) 
+            {
+                DateTime startOfWeek = GetStartOfWeek(month, year, week);
+                DateTime endOfWeek = startOfWeek.AddDays(6);
+
+                // Lấy số lượng user trong tuần
+                int userCount = await _unitOfWork.Users.CountAsync(u =>
+                    u.CreatedAt >= startOfWeek && u.CreatedAt <= endOfWeek);
+
+                // Lấy số lượng trip request trong tuần
+                int tripRequestCount = await _unitOfWork.TripRequests.CountAsync(tr =>
+                    tr.CreatedAt >= startOfWeek && tr.CreatedAt <= endOfWeek);
+
+                // Lấy số lượng trip match trong tuần;
+
+                // Thêm dữ liệu vào response model
+                weeklyStatistics.WeeklyData.Add(new WeeklyDataModel
+                {
+                    Week = week,
+                    UserCount = userCount,
+                    TripRequestCount = tripRequestCount,
+                });
+            }
+
+            return weeklyStatistics;
+        }
+
+        private DateTime GetStartOfWeek(int month, int year, int week)
+        {
+            DateTime firstDayOfMonth = new DateTime(year, month, 1);
+            int offset = (int)firstDayOfMonth.DayOfWeek - 1; // Xác định khoảng cách từ thứ Hai
+            return firstDayOfMonth.AddDays((week - 1) * 7 - offset);
+        }
+
+
     }
 }
