@@ -21,7 +21,14 @@ namespace F_Driver.Repository.Repositories
 
 
         }
-
+        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
+        {
+            if (predicate == null)
+            {
+                return await _dbContext.Set<T>().CountAsync();
+            }
+            return await _dbContext.Set<T>().CountAsync(predicate);
+        }
         public IQueryable<T> FindAll(bool trackChanges = false)
         {
             return !trackChanges ? _dbContext.Set<T>().AsNoTracking() :

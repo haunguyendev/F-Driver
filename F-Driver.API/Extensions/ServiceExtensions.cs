@@ -215,6 +215,7 @@ namespace F_Driver.API.Extensions
                 .AddScoped<EmailService>()
                 .AddScoped<TripRequestService>()
                 .AddScoped<CancellationReasonService>()
+                .AddScoped<DashboardService>()
                 .AddScoped<VNPayService>()
            //Add repository
                 .AddScoped<ICancellationReasonRepository,CancellationReasonRepository>()
