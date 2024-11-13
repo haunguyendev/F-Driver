@@ -8,7 +8,7 @@ namespace F_Driver.Service.BusinessModels
 {
     public class TransactionResponseModel
     {
-        public int TransactionId { get; set; }
+        public int Id { get; set; }
         public decimal Amount { get; set; }
         public string Type { get; set; }
         public DateTime? TransactionDate { get; set; }

@@ -57,6 +57,7 @@ namespace F_Driver.Service.Mapper
 
             CreateMap<CancellationReason,CancellationReasonModel>().ReverseMap();
             CreateMap<Cancellation,CancellationModel>().ReverseMap();
+            CreateMap<Transaction, TransactionResponseModel>().ReverseMap();
 
             CreateMap<User, PassengerDetailModel>().ReverseMap();
             CreateMap<User, DriverDetailModel>().ReverseMap();
