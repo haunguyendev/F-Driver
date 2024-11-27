@@ -1,6 +1,9 @@
 ﻿using F_Driver.DataAccessObject.Models;
 using F_Driver.Repository.Interfaces;
+using F_Driver.Service.BusinessModels;
+using F_Driver.Service.Helpers;
 using F_Driver.Service.Shared;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,5 +99,64 @@ namespace F_Driver.Service.Services
         }
 
         #endregion
+        public async Task<PagedResult<PaymentResponse>> GetPaymentsAsync(
+    int pageIndex = 1,
+    int pageSize = 10,
+        string? sortBy = "PaidAt",
+    bool isAscending = true,
+    string? keySearch = null)
+        {
+            var query = _unitOfWork.Payments.FindAll(false,x=>x.Driver,x=>x.Passenger,x=>x.Match).AsQueryable();
+
+           
+            if (!string.IsNullOrWhiteSpace(keySearch))
+            {
+                query = query.Where(p =>
+                    p.Passenger!.Name.Contains(keySearch) ||
+                    p.Driver!.Name.Contains(keySearch) ||
+                    p.PaymentMethod.Contains(keySearch));
+            }
+
+            // Sắp xếp theo trường chỉ định
+            query = sortBy switch
+            {
+                "Amount" => isAscending ? query.OrderBy(p => p.Amount) : query.OrderByDescending(p => p.Amount),
+                "PaymentMethod" => isAscending ? query.OrderBy(p => p.PaymentMethod) : query.OrderByDescending(p => p.PaymentMethod),
+                "Status" => isAscending ? query.OrderBy(p => p.Status) : query.OrderByDescending(p => p.Status),
+                "PaidAt" or _ => isAscending ? query.OrderBy(p => p.PaidAt) : query.OrderByDescending(p => p.PaidAt)
+            };
+
+            var totalItems = await query.CountAsync();
+
+            var items = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .Select(payment => new PaymentResponse
+                {
+                    PaymentId = payment.Id,
+                    MatchId = payment.MatchId,
+                    PassengerId= payment.Passenger != null ? payment.Passenger.Id : null,
+                    PassengerName = payment.Passenger != null ? payment.Passenger.Name : null,
+                    DriverId= payment.Driver != null ? payment.Driver.Id : null,
+                    DriverName = payment.Driver != null ? payment.Driver.Name : null,
+                    Amount = payment.Amount,
+                    PaymentMethod = payment.PaymentMethod,
+                    Status = payment.Status,
+                    PaidAt = payment.PaidAt
+                })
+                .ToListAsync();
+
+            var result = new PaginatedList<PaymentResponse>(items, totalItems, pageIndex, pageSize);
+            return new PagedResult<PaymentResponse>
+            {
+                Items = result.Items,
+                TotalItems = result.TotalCount,
+                CurrentPage = result.CurrentPage,
+                TotalPages = result.TotalPages,
+                PageSize = result.PageSize,
+
+            };
+        }
+
     }
 }
