@@ -18,7 +18,40 @@ namespace F_Driver.API.Controllers
             _paymentService = paymentService;
         }
 
-        [HttpPost("{paymentId}/confirm")]
+        [HttpGet]
+        public async Task<IActionResult> GetPaymentsAsync(
+    [FromQuery] int pageIndex = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? sortBy = "PaidAt",
+    [FromQuery] bool isAscending = true,
+    [FromQuery] string? keySearch = null)
+        {
+            if (pageIndex < 1 || pageSize < 1)
+            {
+                return BadRequest("Page index and page size must be greater than zero.");
+            }
+
+            var result = await _paymentService.GetPaymentsAsync(pageIndex, pageSize, sortBy, isAscending, keySearch);
+
+            if (!result.Items.Any())
+            {
+                return Ok(new
+                {
+                    status = StatusCodes.Status204NoContent,
+                    message = "No payments found."
+                });
+            }
+
+            return Ok(new
+            {
+                status = StatusCodes.Status200OK,
+                message = "Get payments successfully!",
+                data = result
+            });
+
+        }
+
+            [HttpPost("{paymentId}/confirm")]
         [SwaggerOperation(
             Summary = "Confirm Payment",
             Description = "Allows a driver to confirm a payment, which will trigger the payment process if both parties agree."
@@ -81,6 +114,8 @@ namespace F_Driver.API.Controllers
                 return StatusCode(500, ApiResult<object>.Fail(ex));
             }
         }
+
+
 
     }
 }
